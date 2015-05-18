@@ -10,3 +10,5 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 POST	/register								controllers.Application.register()
 POST	/login									controllers.Application.login()	
+POST	/forgotPassword							controllers.Application.forgotPassword()
+POST	/scanProduct							controllers.Application.scanProduct()	

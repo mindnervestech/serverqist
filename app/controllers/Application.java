@@ -16,6 +16,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import models.Customer;
+import models.Product;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -29,6 +30,7 @@ import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import sun.misc.BASE64Encoder;
 import viewmodels.CustomerVM;
+import viewmodels.ProductVM;
 import views.html.index;
 
 public class Application extends Controller {
@@ -200,6 +202,32 @@ public class Application extends Controller {
    	 return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
     }
     
+    
+    public static Result scanProduct(){
+   	 DynamicForm users = Form.form().bindFromRequest();
+   	 String qrcode = users.get("qrCode");
+   	 Product p = Product.findByQrCode(qrcode);
+   	 if(p == null){
+   		return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+   		 
+   	 }else{
+   		ProductVM pvm = new ProductVM();
+  		 pvm.setName(p.name);
+  		 pvm.setDescription(p.description);
+  		 pvm.setImage(p.image);
+  		 pvm.setQrCode(p.qrCode);
+  		 pvm.setQistNo(p.qistNo);
+  		 pvm.setSpecifications(p.specifications);
+  		 pvm.setStatus(p.status);
+  		 pvm.setCreatedTime(p.createdTime);
+  		 pvm.setId(p.id);
+  		 pvm.setMfrSku(p.mfrSku);
+  		 pvm.setStoreSku(p.storeSku);
+  		return ok(Json.toJson(pvm));
+   	 }
+    
+   	// return ok(Json.toJson(p));
+    }
     
     public static void sendPasswordMail(String email,String pass) {
     	final String username = "mindnervesdemo@gmail.com";
