@@ -11,6 +11,7 @@ public class CustomerVM {
 	public String password;
 	public String retypePassword;
 	public String address;
+	public String image;
 	public String FacebookId;
 	public String GooglePlusId;
 	public String TwitterId;

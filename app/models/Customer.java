@@ -45,4 +45,16 @@ public class Customer extends Model{
 	public static Customer findByEmailAndPassword(String email, String password) {
 		return find.where().eq("email", email).eq("password", password).findUnique();
 	}
+	
+	public static Customer findByFbId(String FacebookId) {
+		return find.where().eq("FacebookId", FacebookId).findUnique();
+	}
+	
+	public static Customer findByGoogleID(String GooglePlusId) {
+		return find.where().eq("GooglePlusId", GooglePlusId).findUnique();
+	}
+	
+	public static Customer findByTwitterId(String TwitterId) {
+		return find.where().eq("TwitterId", TwitterId).findUnique();
+	}
 }
