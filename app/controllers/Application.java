@@ -6,7 +6,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.UUID;
+
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import models.Customer;
 
@@ -23,7 +30,6 @@ import play.mvc.Result;
 import sun.misc.BASE64Encoder;
 import viewmodels.CustomerVM;
 import views.html.index;
-import org.apache.commons.codec.binary.Base64;
 
 public class Application extends Controller {
   
@@ -113,7 +119,7 @@ public class Application extends Controller {
 		c.qCartMailingList = qcart;
 		c.type = "M";
 		if(FacebookId != null && !FacebookId.isEmpty()){
-			Customer cc = Customer.findByFbId(c.FacebookId);
+			Customer cc = Customer.findByFbId(FacebookId);
 			if(cc != null){
 				HashMap<String, String> map = new HashMap<>();
 				map.put("CTPYE", "S");
@@ -125,7 +131,7 @@ public class Application extends Controller {
 			}
 			
 		} else if(GooglePlusId != null && !GooglePlusId.isEmpty()){
-			Customer cc = Customer.findByGoogleID(c.GooglePlusId);
+			Customer cc = Customer.findByGoogleID(GooglePlusId);
 			if(cc != null){
 				HashMap<String, String> map = new HashMap<>();
 				map.put("CTPYE", "S");
@@ -136,7 +142,7 @@ public class Application extends Controller {
 				c.type = "S";
 			}
 		} else if(TwitterId != null && !TwitterId.isEmpty()){
-			Customer cc = Customer.findByTwitterId(c.TwitterId);
+			Customer cc = Customer.findByTwitterId(TwitterId);
 					if(cc != null){
 						HashMap<String, String> map = new HashMap<>();
 						map.put("CTPYE", "S");
@@ -180,5 +186,56 @@ public class Application extends Controller {
 		return ok(Json.toJson(map1));
 		//return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
     }
-  
+    
+    public static Result forgotPassword(){
+    	
+   	 DynamicForm users = Form.form().bindFromRequest();
+   	 String email = users.get("email");
+   	 Customer c = Customer.findByEmail(email);
+   	if(c == null){
+		return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+	}else{
+		sendPasswordMail(c.email,c.password);
+	}
+   	 return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
+    }
+    
+    
+    public static void sendPasswordMail(String email,String pass) {
+    	final String username = "mindnervesdemo@gmail.com";
+    	final String password = "mindnervesadmin";
+    	Properties props = new Properties();
+    	props.put("mail.smtp.auth", "true");
+    	props.put("mail.smtp.host", "smtp.gmail.com");
+    	props.put("mail.smtp.port", "587");
+    	props.put("mail.smtp.starttls.enable", "true");
+    	Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+    		protected PasswordAuthentication getPasswordAuthentication() {
+    			return new PasswordAuthentication(username, password);
+    		}
+    	});
+    	try
+    	{
+	    	Message message = new MimeMessage(session);
+	    	message.setFrom(new InternetAddress("mindnervesdemo@gmail.com"));
+	    	message.setRecipients(Message.RecipientType.TO,
+	    	InternetAddress.parse(email));
+	    	message.setSubject("Password Recovery");
+	    	Multipart multipart = new MimeMultipart();
+	    	BodyPart messageBodyPart = new MimeBodyPart();
+	    	messageBodyPart = new MimeBodyPart();
+	    	String template = "<p>Email : "+email+" <br>Password :"+pass+"</p>"; 
+	    	messageBodyPart.setContent(template, "text/html");
+	    	multipart.addBodyPart(messageBodyPart);
+	    	message.setContent(multipart);
+	    	Transport.send(message);
+	    	System.out.println("Sent test message successfully....");
+    	}
+    		catch (Exception e)
+    		{
+    			e.printStackTrace();
+    		} 
+    	} 
+    
+    
 }

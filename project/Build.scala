@@ -12,6 +12,7 @@ object ApplicationBuild extends Build {
     javaCore,
     javaJdbc,
     javaEbean,
+	"javax.mail" % "mail" % "1.4",
     "mysql" % "mysql-connector-java" % "5.1.18"
   )
 

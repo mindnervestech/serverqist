@@ -46,6 +46,10 @@ public class Customer extends Model{
 		return find.where().eq("email", email).eq("password", password).findUnique();
 	}
 	
+	public static Customer findByEmail(String email) {
+		return find.where().eq("email", email).findUnique();
+	}
+	
 	public static Customer findByFbId(String FacebookId) {
 		return find.where().eq("FacebookId", FacebookId).findUnique();
 	}
