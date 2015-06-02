@@ -30,6 +30,9 @@ public class Customer extends Model{
 	public boolean qCartMailingList;
 	public String qistNo;
 	public Date lastActive;
+	public Date createdDate;
+	public Date updatedDate;
+	
 	
 	@ManyToMany
 	public List<Product> cart;

@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -47,9 +48,11 @@ public class Application extends Controller {
 		}
 		private String code;
 		private String message;
+		
 		public String getCode() {
 			return code;
 		}
+		
 		public String getMessage() {
 			return message;
 		}
@@ -154,7 +157,12 @@ public class Application extends Controller {
 							c.type = "S";
 					}	
 		}
-		c.lastActive = new Date();
+		
+		Date date = new Date();
+		//c.lastActive = new Date();
+		c.createdDate = date;
+		c.updatedDate = date;
+
 		c.qistNo = UUID.randomUUID().toString();
 		c.save();
 		HashMap<String, String> map1 = new HashMap<>();
