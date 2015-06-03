@@ -4,7 +4,10 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -14,17 +17,82 @@ import play.db.ebean.Model;
 public class CustomerSession extends Model{
 	
 	@Id
-	public Long id;
-	public Date start;
-	public Date end;
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private Long id;
+	private Date start;
+	private Date end;
 	
 	@ManyToOne
-	public Retailer store;
+	@JoinColumn(name="retailer_id")
+	public WdRetailer wdRetailer;
 	
 	@ManyToOne
-	public Customer customer;
+	@JoinColumn(name="customer_id")
+	public WdCustomer wdCustomer;
 	
-	@OneToMany
-	public List<SessionProduct> products;
+	@OneToMany(mappedBy="customerSession")
+	public List<SessionProduct> sessionProducts;
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Date getStart() {
+		return start;
+	}
+
+	public void setStart(Date start) {
+		this.start = start;
+	}
+
+	public Date getEnd() {
+		return end;
+	}
+
+	public void setEnd(Date end) {
+		this.end = end;
+	}
+
+	public WdRetailer getWdRetailer() {
+		return wdRetailer;
+	}
+
+	public void setWdRetailer(WdRetailer wdRetailer) {
+		this.wdRetailer = wdRetailer;
+	}
+
+	public WdCustomer getWdCustomer() {
+		return wdCustomer;
+	}
+
+	public void setWdCustomer(WdCustomer wdCustomer) {
+		this.wdCustomer = wdCustomer;
+	}
+
+	public List<SessionProduct> getSessionProducts() {
+		return sessionProducts;
+	}
+
+	public void setSessionProducts(List<SessionProduct> sessionProducts) {
+		this.sessionProducts = sessionProducts;
+	}
+	
+	public SessionProduct addSessionProduct(SessionProduct sessionProduct) {
+		getSessionProducts().add(sessionProduct);
+		sessionProduct.setCustomerSession(this);
+
+		return sessionProduct;
+	}
+
+	public SessionProduct removeSessionProduct(SessionProduct sessionProduct) {
+		getSessionProducts().remove(sessionProduct);
+		sessionProduct.setCustomerSession(null);
+
+		return sessionProduct;
+	}
+	
 }
