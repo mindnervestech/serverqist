@@ -432,13 +432,71 @@ public class Application extends Controller {
 	  }
 
 
+	public static Result getCustomerProduct(){
+		DynamicForm custId = Form.form().bindFromRequest();
+		Long id = Long.parseLong(custId.get("id"));
+	    
+		 WdCustomer c = WdCustomer.findById(id); 
+		 ArrayList<ProductVM> VMs =  new ArrayList<ProductVM>();
+			
+			
+		if(c == null){
+			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+		}else{
+			List <WdProduct> wdP  = c.getWdProducts();
+			
+			
+			for(WdProduct p: wdP){
+				ProductVM vm = new ProductVM();
+				vm.id = p.getId();
+				vm.name = p.getName();
+				vm.description = p .getDescription();
+				vm.image = p.getImage();
+				vm.qrCode = p.getQrCode();
+				vm.specifications = p.getSpecifications();
+				vm.status = p .getStatus();
+				vm.createdTime = p.getCreatedTime();
+				vm.approvedDate = p.getApprovedDate();
+				vm.createdDate = p.getCreatedDate();
+				vm.updatedDate = p.getUpdatedDate();
+				vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
+				vm.mfrSku = p.getMfrSku();
+				vm.storeSku = p.getStoreSku();
+				vm.qistNo = p.getQistSku()+p.getSkuPostfix();
+			    VMs.add(vm);
+				
+			}
+			
+
+		}
+		
+		return ok(Json.toJson(VMs));
+	}
+	
+	
+
+
 	public static Result scanProduct(){
 		DynamicForm users = Form.form().bindFromRequest();
 		String qrcode = users.get("qrCode");
+		String id = users.get("userId");
+		WdCustomer w = WdCustomer.findById(Long.parseLong(id));
+		
 		WdProduct p = WdProduct.findByQrCode(qrcode);
-		if(p == null){
+		if(p == null || w == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
 		}
+		
+		List<WdProduct> prods = w.getWdProducts();
+		
+		if(!prods.contains(p)){
+			prods.add(p);
+			w.setWdProducts(prods);
+			w.save();
+		}
+		
+		
+		
 		ProductVM vm = new ProductVM();
 		vm.id = p.getId();
 		vm.name = p.getName();
