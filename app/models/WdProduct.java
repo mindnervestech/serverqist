@@ -309,5 +309,11 @@ public class WdProduct extends Model {
 	public static WdProduct findByQrCode(String qrcode) {
 		return find.where().eq("qrCode", qrcode).findUnique();
 	}
+	
+	public static List<WdProduct> findByRetailer(WdRetailer wdRetailer) {
+		return find.where().eq("wdRetailer", wdRetailer).findList();
+	}
+	
+	
 
 }

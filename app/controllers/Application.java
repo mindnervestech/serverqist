@@ -4,8 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.BodyPart;
@@ -18,9 +25,20 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import models.WdCustomer;
 import models.WdProduct;
+import models.WdRetailer;
+
+import org.apache.commons.codec.binary.Base64;
+import org.w3c.dom.Document;
+
 import play.data.DynamicForm;
 import play.data.Form;
 import play.libs.Json;
@@ -28,13 +46,19 @@ import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
-import sun.misc.BASE64Encoder;
 import viewmodels.CustomerVM;
 import viewmodels.ProductVM;
+import viewmodels.RetailerVM;
 import views.html.index;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Application extends Controller {
 
+	private static final String URL = "http://maps.googleapis.com/maps/api/geocode/json";
+	
+	private static final double dist = 5.0;
+	
 	public static Result index() {
 		return ok(index.render("Your new application is ready."));
 	}
@@ -91,11 +115,9 @@ public class Application extends Controller {
 					FileInputStream imageInFile = new FileInputStream(f);
 					byte imageData[] = new byte[(int) f.length()];
 					imageInFile.read(imageData);
-					BASE64Encoder encoder = new BASE64Encoder();
-					imageDataString = encoder.encode(imageData);
-					System.out.println("imageee===="+imageDataString);
 					imageInFile.close();
-
+					imageDataString = Base64.encodeBase64URLSafeString(imageData);
+					System.out.println("imageee===="+imageDataString);
 				} catch (FileNotFoundException e) {
 					System.out.println("Image not found" + e);
 				} catch (IOException ioe) {
@@ -254,6 +276,160 @@ public class Application extends Controller {
 		c.update();
 		return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
 	}
+	
+	public static Result getMyOffers() throws Exception{
+		DynamicForm users = Form.form().bindFromRequest();
+		String lat = users.get("lat");
+		String lon = users.get("long");
+		System.out.println("my lat===="+lat);
+		System.out.println("my longt===="+lon);
+		double lon1 = Double.parseDouble(lon);
+		double latn1 = Double.parseDouble(lat);
+		long currentId = 0;
+		double currDist = 0;
+		List<WdRetailer> wd = WdRetailer.findAll();
+		List<RetailerVM> vmList = new ArrayList<>();
+		for(WdRetailer w:wd){
+			String fullAddress = w.getStreetNo()+","+w.getStreetName()+","+w.getSuburb()+","+w.getCity();
+			String[] latLongs = getLatLongPositions(fullAddress);
+			double lon2 = Double.parseDouble(latLongs[1]);
+			double lat2 = Double.parseDouble(latLongs[0]);
+			System.out.println("address lattt=="+latLongs[0]);
+			System.out.println("address longg=="+latLongs[1]);
+			System.out.println(distance(latn1,lon1,lat2,lon2));
+			double mydist = distance(latn1,lon1,lat2,lon2);
+			if(mydist <= dist ){
+				if(currentId == 0){
+					currentId = w.getId();
+					currDist = mydist;
+				} else {
+					if(mydist < currDist){
+						currentId = w.getId();
+						currDist = mydist;
+					}
+				}
+				RetailerVM vm = new RetailerVM();
+				vm.setBusinessName(w.getBusinessName());
+				vm.setStreetName(w.getStreetName());
+				vm.setStreetNo(w.getStreetNo());
+				vm.setSuburb(w.getSuburb());
+				vm.setTradingName(w.getTradingName());
+				vm.setCity(w.getCity());
+				vm.setContactPerson(w.getContactPerson());
+				vm.setWorkEmail(w.getWorkEmail());
+				vm.setQistNo(w.getQistSku()+w.getSkuPostfix());
+				vmList.add(vm);
+			}
+		}
+		List<ProductVM> prods = getProducts(currentId);
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("prod", prods);
+		map.put("retailer", vmList);
+		return ok(Json.toJson(map));
+	}
+	
+	private static List<ProductVM> getProducts(Long id) {
+		
+		WdRetailer wd = WdRetailer.findById(id);
+		
+		List<WdProduct> prod = WdProduct.findByRetailer(wd);
+		List<ProductVM> plist = new ArrayList<>();
+		for(WdProduct p : prod){
+			ProductVM vm = new ProductVM();
+			vm.id = p.getId();
+			vm.name = p.getName();
+			vm.description = p .getDescription();
+			vm.image = p.getImage();
+			vm.qrCode = p.getQrCode();
+			vm.specifications = p.getSpecifications();
+			vm.status = p .getStatus();
+			vm.createdTime = p.getCreatedTime();
+			vm.approvedDate = p.getApprovedDate();
+			vm.createdDate = p.getCreatedDate();
+			vm.updatedDate = p.getUpdatedDate();
+			vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
+			vm.mfrSku = p.getMfrSku();
+			vm.storeSku = p.getStoreSku();
+			vm.qistNo = p.getQistSku()+p.getSkuPostfix();
+			plist.add(vm);
+		}
+		return plist;
+	}
+	
+	public static Result getRetailerProducts() {
+		DynamicForm users = Form.form().bindFromRequest();
+		Long id = Long.parseLong(users.get("retailerId"));
+		WdRetailer wdr = WdRetailer.findById(id);
+		List<RetailerVM> relist = new ArrayList<>();
+		RetailerVM w = new RetailerVM();
+		RetailerVM vm = new RetailerVM();
+		vm.setBusinessName(w.getBusinessName());
+		vm.setStreetName(w.getStreetName());
+		vm.setStreetNo(w.getStreetNo());
+		vm.setSuburb(w.getSuburb());
+		vm.setTradingName(w.getTradingName());
+		vm.setCity(w.getCity());
+		vm.setContactPerson(w.getContactPerson());
+		vm.setWorkEmail(w.getWorkEmail());
+		vm.setQistNo(w.getQistSku()+w.getSkuPostfix());
+		relist.add(vm);
+		List<ProductVM> prods = getProducts(id);
+		HashMap<String, Object> map = new HashMap<>();
+		map.put("retailer", relist);
+		map.put("products", prods);
+		return ok(Json.toJson(map));
+	}
+	
+	
+	 private static double distance(double lat1, double lon1, double lat2, double lon2) {
+	      double theta = lon1 - lon2;
+	      double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+	      dist = Math.acos(dist);
+	      dist = rad2deg(dist);
+	      dist = dist * 60 * 1.1515;
+	      dist = dist * 1.609344;
+	      return (dist);
+	    }
+
+	    private static double deg2rad(double deg) {
+	      return (deg * Math.PI / 180.0);
+	    }
+
+	    private static double rad2deg(double rad) {
+	      return (rad * 180.0 / Math.PI);
+	    }
+
+	 public static String[] getLatLongPositions(String address) throws Exception
+	  {
+	    int responseCode = 0;
+	    String api = "http://maps.googleapis.com/maps/api/geocode/xml?address=" + URLEncoder.encode(address, "UTF-8") + "&sensor=true";
+	    URL url = new URL(api);
+	    HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+	    httpConnection.connect();
+	    responseCode = httpConnection.getResponseCode();
+	    if(responseCode == 200)
+	    {
+	      DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();;
+	      Document document = builder.parse(httpConnection.getInputStream());
+	      XPathFactory xPathfactory = XPathFactory.newInstance();
+	      XPath xpath = xPathfactory.newXPath();
+	      XPathExpression expr = xpath.compile("/GeocodeResponse/status");
+	      String status = (String)expr.evaluate(document, XPathConstants.STRING);
+	      if(status.equals("OK"))
+	      {
+	         expr = xpath.compile("//geometry/location/lat");
+	         String latitude = (String)expr.evaluate(document, XPathConstants.STRING);
+	         expr = xpath.compile("//geometry/location/lng");
+	         String longitude = (String)expr.evaluate(document, XPathConstants.STRING);
+	         return new String[] {latitude, longitude};
+	      }
+	      else
+	      {
+	         throw new Exception("Error from the API - response status: "+status);
+	      }
+	    }
+	    return null;
+	  }
 
 
 	public static Result scanProduct(){
