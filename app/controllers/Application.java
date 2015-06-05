@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,11 +49,11 @@ import viewmodels.ProductVM;
 import viewmodels.RetailerVM;
 import views.html.index;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class Application extends Controller {
 
-	private static final String URL = "http://maps.googleapis.com/maps/api/geocode/json";
+	//private static final String URL = "http://maps.googleapis.com/maps/api/geocode/json";
 	
 	private static final double dist = 5.0;
 	
@@ -191,12 +189,14 @@ public class Application extends Controller {
 	}
 
 	public static Result login(){
-		DynamicForm users = Form.form().bindFromRequest();
-		if(users.get("email").isEmpty() || users.get("email") == null ||
-				users.get("password").isEmpty() || users.get("password") == null){
+		JsonNode data = request().body().asJson();
+		String email = data.path("email").asText();
+		String password = data.path("password").asText();
+		if(email.isEmpty() || email == null ||
+				password.isEmpty() || password == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
 		}
-		WdCustomer c = WdCustomer.findByEmailAndPassword(users.get("email"), users.get("password"));
+		WdCustomer c = WdCustomer.findByEmailAndPassword(email, password);
 		if(c == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
 		}
@@ -208,9 +208,8 @@ public class Application extends Controller {
 	}
 
 	public static Result forgotPassword(){
-
-		DynamicForm users = Form.form().bindFromRequest();
-		String email = users.get("email");
+		JsonNode data = request().body().asJson();
+		String email = data.path("email").asText();
 		WdCustomer c = WdCustomer.findByEmail(email);
 		if(c == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
@@ -221,8 +220,8 @@ public class Application extends Controller {
 	}
 	
 	public static Result getCustomerProfile(){
-		DynamicForm users = Form.form().bindFromRequest();
-		Long id = Long.parseLong(users.get("userId"));
+		JsonNode data = request().body().asJson();
+		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
@@ -241,48 +240,46 @@ public class Application extends Controller {
 	}
 	
 	public static Result changeCustomerName(){
-		DynamicForm users = Form.form().bindFromRequest();
-		Long id = Long.parseLong(users.get("userId"));
+		JsonNode data = request().body().asJson();
+		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
 		}
-		c.setFirstname(users.get("firstName"));
-		c.setLastname(users.get("lastName"));
+		c.setFirstname(data.path("firstName").asText());
+		c.setLastname(data.path("lastName").asText());
 		c.update();
 		return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
 	}
 	
 	public static Result changeCustomerPassword(){
-		DynamicForm users = Form.form().bindFromRequest();
-		Long id = Long.parseLong(users.get("userId"));
+		JsonNode data = request().body().asJson();
+		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
 		}
-		c.setPassword(users.get("password"));
+		c.setPassword(data.path("password").asText());
 		c.update();
 		return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
 	}
 	
 	public static Result changeCustomerAddress(){
-		DynamicForm users = Form.form().bindFromRequest();
-		Long id = Long.parseLong(users.get("userId"));
+		JsonNode data = request().body().asJson();
+		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
 		}
-		c.setAddress(users.get("address"));
+		c.setAddress(data.path("address").asText());
 		c.update();
 		return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
 	}
 	
 	public static Result getMyOffers() throws Exception{
-		DynamicForm users = Form.form().bindFromRequest();
-		String lat = users.get("lat");
-		String lon = users.get("long");
-		System.out.println("my lat===="+lat);
-		System.out.println("my longt===="+lon);
+		JsonNode data = request().body().asJson();
+		String lat = data.path("lat").asText();
+		String lon = data.path("long").asText();
 		double lon1 = Double.parseDouble(lon);
 		double latn1 = Double.parseDouble(lat);
 		long currentId = 0;
@@ -294,9 +291,6 @@ public class Application extends Controller {
 			String[] latLongs = getLatLongPositions(fullAddress);
 			double lon2 = Double.parseDouble(latLongs[1]);
 			double lat2 = Double.parseDouble(latLongs[0]);
-			System.out.println("address lattt=="+latLongs[0]);
-			System.out.println("address longg=="+latLongs[1]);
-			System.out.println(distance(latn1,lon1,lat2,lon2));
 			double mydist = distance(latn1,lon1,lat2,lon2);
 			if(mydist <= dist ){
 				if(currentId == 0){
@@ -323,15 +317,13 @@ public class Application extends Controller {
 		}
 		List<ProductVM> prods = getProducts(currentId);
 		HashMap<String, Object> map = new HashMap<>();
-		map.put("prod", prods);
-		map.put("retailer", vmList);
+		map.put("products", prods);
+		map.put("retailers", vmList);
 		return ok(Json.toJson(map));
 	}
 	
 	private static List<ProductVM> getProducts(Long id) {
-		
 		WdRetailer wd = WdRetailer.findById(id);
-		
 		List<WdProduct> prod = WdProduct.findByRetailer(wd);
 		List<ProductVM> plist = new ArrayList<>();
 		for(WdProduct p : prod){
@@ -357,11 +349,9 @@ public class Application extends Controller {
 	}
 	
 	public static Result getRetailerProducts() {
-		DynamicForm users = Form.form().bindFromRequest();
-		Long id = Long.parseLong(users.get("retailerId"));
-		WdRetailer wdr = WdRetailer.findById(id);
-		List<RetailerVM> relist = new ArrayList<>();
-		RetailerVM w = new RetailerVM();
+		JsonNode data = request().body().asJson();
+		Long id = data.path("retailerId").asLong();
+		WdRetailer w = WdRetailer.findById(id);
 		RetailerVM vm = new RetailerVM();
 		vm.setBusinessName(w.getBusinessName());
 		vm.setStreetName(w.getStreetName());
@@ -372,80 +362,74 @@ public class Application extends Controller {
 		vm.setContactPerson(w.getContactPerson());
 		vm.setWorkEmail(w.getWorkEmail());
 		vm.setQistNo(w.getQistSku()+w.getSkuPostfix());
-		relist.add(vm);
 		List<ProductVM> prods = getProducts(id);
 		HashMap<String, Object> map = new HashMap<>();
-		map.put("retailer", relist);
+		map.put("retailer", vm);
 		map.put("products", prods);
 		return ok(Json.toJson(map));
 	}
 	
 	
-	 private static double distance(double lat1, double lon1, double lat2, double lon2) {
-	      double theta = lon1 - lon2;
-	      double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
-	      dist = Math.acos(dist);
-	      dist = rad2deg(dist);
-	      dist = dist * 60 * 1.1515;
-	      dist = dist * 1.609344;
-	      return (dist);
-	    }
+	private static double distance(double lat1, double lon1, double lat2, double lon2) {
+		double theta = lon1 - lon2;
+		double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+		dist = Math.acos(dist);
+		dist = rad2deg(dist);
+		dist = dist * 60 * 1.1515;
+		dist = dist * 1.609344;
+		return (dist);
+	}
 
-	    private static double deg2rad(double deg) {
-	      return (deg * Math.PI / 180.0);
-	    }
+	private static double deg2rad(double deg) {
+		return (deg * Math.PI / 180.0);
+	}
 
-	    private static double rad2deg(double rad) {
-	      return (rad * 180.0 / Math.PI);
-	    }
+	private static double rad2deg(double rad) {
+		return (rad * 180.0 / Math.PI);
+	}
 
-	 public static String[] getLatLongPositions(String address) throws Exception
-	  {
-	    int responseCode = 0;
-	    String api = "http://maps.googleapis.com/maps/api/geocode/xml?address=" + URLEncoder.encode(address, "UTF-8") + "&sensor=true";
-	    URL url = new URL(api);
-	    HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
-	    httpConnection.connect();
-	    responseCode = httpConnection.getResponseCode();
-	    if(responseCode == 200)
-	    {
-	      DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();;
-	      Document document = builder.parse(httpConnection.getInputStream());
-	      XPathFactory xPathfactory = XPathFactory.newInstance();
-	      XPath xpath = xPathfactory.newXPath();
-	      XPathExpression expr = xpath.compile("/GeocodeResponse/status");
-	      String status = (String)expr.evaluate(document, XPathConstants.STRING);
-	      if(status.equals("OK"))
-	      {
-	         expr = xpath.compile("//geometry/location/lat");
-	         String latitude = (String)expr.evaluate(document, XPathConstants.STRING);
-	         expr = xpath.compile("//geometry/location/lng");
-	         String longitude = (String)expr.evaluate(document, XPathConstants.STRING);
-	         return new String[] {latitude, longitude};
-	      }
-	      else
-	      {
-	         throw new Exception("Error from the API - response status: "+status);
-	      }
-	    }
-	    return null;
-	  }
+	private static String[] getLatLongPositions(String address) throws Exception
+	{
+		int responseCode = 0;
+		String api = "http://maps.googleapis.com/maps/api/geocode/xml?address=" + URLEncoder.encode(address, "UTF-8") + "&sensor=true";
+		URL url = new URL(api);
+		HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+		httpConnection.connect();
+		responseCode = httpConnection.getResponseCode();
+		if(responseCode == 200)
+		{
+			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();;
+			Document document = builder.parse(httpConnection.getInputStream());
+			XPathFactory xPathfactory = XPathFactory.newInstance();
+			XPath xpath = xPathfactory.newXPath();
+			XPathExpression expr = xpath.compile("/GeocodeResponse/status");
+			String status = (String)expr.evaluate(document, XPathConstants.STRING);
+			if(status.equals("OK"))
+			{
+				expr = xpath.compile("//geometry/location/lat");
+				String latitude = (String)expr.evaluate(document, XPathConstants.STRING);
+				expr = xpath.compile("//geometry/location/lng");
+				String longitude = (String)expr.evaluate(document, XPathConstants.STRING);
+				return new String[] {latitude, longitude};
+			}
+			else
+			{
+				throw new Exception("Error from the API - response status: "+status);
+			}
+		}
+		return null;
+	}
 
 
-	public static Result getCustomerProduct(){
-		DynamicForm custId = Form.form().bindFromRequest();
-		Long id = Long.parseLong(custId.get("id"));
-	    
-		 WdCustomer c = WdCustomer.findById(id); 
-		 ArrayList<ProductVM> VMs =  new ArrayList<ProductVM>();
-			
-			
+	public static Result getCustomerCart(){
+		JsonNode data = request().body().asJson();
+		Long id = data.path("userId").asLong();
+		WdCustomer c = WdCustomer.findById(id); 
+		ArrayList<ProductVM> VMs =  new ArrayList<ProductVM>();
 		if(c == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
 		}else{
 			List <WdProduct> wdP  = c.getWdProducts();
-			
-			
 			for(WdProduct p: wdP){
 				ProductVM vm = new ProductVM();
 				vm.id = p.getId();
@@ -463,40 +447,27 @@ public class Application extends Controller {
 				vm.mfrSku = p.getMfrSku();
 				vm.storeSku = p.getStoreSku();
 				vm.qistNo = p.getQistSku()+p.getSkuPostfix();
-			    VMs.add(vm);
-				
+				VMs.add(vm);
 			}
-			
-
 		}
-		
 		return ok(Json.toJson(VMs));
 	}
-	
-	
-
 
 	public static Result scanProduct(){
-		DynamicForm users = Form.form().bindFromRequest();
-		String qrcode = users.get("qrCode");
-		String id = users.get("userId");
-		WdCustomer w = WdCustomer.findById(Long.parseLong(id));
-		
+		JsonNode data = request().body().asJson();
+		Long userId = data.path("userId").asLong();
+		String qrcode = data.path("qrCode").asText();
+		WdCustomer w = WdCustomer.findById(userId);
 		WdProduct p = WdProduct.findByQrCode(qrcode);
 		if(p == null || w == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
 		}
-		
 		List<WdProduct> prods = w.getWdProducts();
-		
 		if(!prods.contains(p)){
 			prods.add(p);
 			w.setWdProducts(prods);
 			w.save();
 		}
-		
-		
-		
 		ProductVM vm = new ProductVM();
 		vm.id = p.getId();
 		vm.name = p.getName();
@@ -551,6 +522,5 @@ public class Application extends Controller {
 			e.printStackTrace();
 		} 
 	} 
-
 
 }
