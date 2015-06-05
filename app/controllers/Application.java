@@ -66,33 +66,8 @@ public class Application extends Controller {
 		return ok(index.render("Your new application is ready."));
 	}
 
-	public static enum Error {
-		E200("200", "OK"), E500("500", "ERROR");
-		Error(String code, String message) {
-			this.code = code;
-			this.message = message;
-		}
-		private String code;
-		private String message;
-		public String getCode() {
-			return code;
-		}
-		public String getMessage() {
-			return message;
-		}
-	}
-
-	public static class ErrorResponse {
-		public String code;
-		public String message;
-		public ErrorResponse(String code,String message) {
-			this.code = code;
-			this.message = message;
-		}
-	}
-
 	public static Result register(){
-
+		HashMap<String, Object> map = new HashMap<>();
 		DynamicForm users = Form.form().bindFromRequest();
 		String fname = users.get("firstName");
 		String lname = users.get("lastName");
@@ -112,29 +87,38 @@ public class Application extends Controller {
 			FilePart filePart = body.getFile("image");
 			if (filePart != null) {
 				File f = filePart.getFile();
-				System.out.println("imageee file===="+f);
-
 				try {            
 					FileInputStream imageInFile = new FileInputStream(f);
 					byte imageData[] = new byte[(int) f.length()];
 					imageInFile.read(imageData);
 					imageInFile.close();
 					imageDataString = Base64.encodeBase64URLSafeString(imageData);
-					System.out.println("imageee===="+imageDataString);
 				} catch (FileNotFoundException e) {
 					System.out.println("Image not found" + e);
 				} catch (IOException ioe) {
 					System.out.println("Exception while reading the Image " + ioe);
 				}
-
 			}
 		}
 		if(fname.isEmpty() || fname == null ||
 				lname.isEmpty() || lname == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "Please fill required data.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}
 		if(!pass.equals(repass)){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "Passwords don't match.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
+		WdCustomer cus = WdCustomer.findByEmail(email);
+		if(cus != null){
+			map.put("status", "500");
+			map.put("message", "User already exists.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}
 
 		c.setFirstname(fname);
@@ -153,9 +137,12 @@ public class Application extends Controller {
 		if(FacebookId != null && !FacebookId.isEmpty()){
 			WdCustomer cc = WdCustomer.findByFbId(FacebookId);
 			if(cc != null){
-				HashMap<String, String> map = new HashMap<>();
-				map.put("CTPYE", "S");
-				map.put("CustomerID", cc.getId().toString());
+				HashMap<String, Object> map1 = new HashMap<>();
+				map1.put("CTPYE", "S");
+				map1.put("CustomerID", cc.getId().toString());
+				map.put("status", "200");
+				map.put("message", "OK.");
+				map.put("data", map1);
 				return ok(Json.toJson(map));
 			}else{
 				c.setFacebookid(FacebookId);
@@ -165,9 +152,12 @@ public class Application extends Controller {
 		} else if(GooglePlusId != null && !GooglePlusId.isEmpty()){
 			WdCustomer cc = WdCustomer.findByGoogleID(GooglePlusId);
 			if(cc != null){
-				HashMap<String, String> map = new HashMap<>();
-				map.put("CTPYE", "S");
-				map.put("CustomerID", cc.getId().toString());
+				HashMap<String, Object> map1 = new HashMap<>();
+				map1.put("CTPYE", "S");
+				map1.put("CustomerID", cc.getId().toString());
+				map.put("status", "200");
+				map.put("message", "OK.");
+				map.put("data", map1);
 				return ok(Json.toJson(map));
 			}else{
 				c.setGoogleplusid(GooglePlusId);
@@ -176,9 +166,12 @@ public class Application extends Controller {
 		} else if(TwitterId != null && !TwitterId.isEmpty()){
 			WdCustomer cc = WdCustomer.findByTwitterId(TwitterId);
 			if(cc != null){
-				HashMap<String, String> map = new HashMap<>();
-				map.put("CTPYE", "S");
-				map.put("CustomerID", cc.getId().toString());
+				HashMap<String, Object> map1 = new HashMap<>();
+				map1.put("CTPYE", "S");
+				map1.put("CustomerID", cc.getId().toString());
+				map.put("status", "200");
+				map.put("message", "OK.");
+				map.put("data", map1);
 				return ok(Json.toJson(map));
 			}else{
 				c.setTwitterid(TwitterId);
@@ -186,48 +179,80 @@ public class Application extends Controller {
 			}	
 		}
 		c.save();
-		HashMap<String, String> map1 = new HashMap<>();
+		
+		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("CTPYE", c.getType());
 		map1.put("CustomerID", c.getId().toString());
-		return ok(Json.toJson(map1));
-		//return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", map1);
+		return ok(Json.toJson(map));
 	}
 
 	public static Result login(){
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		String email = data.path("email").asText();
 		String password = data.path("password").asText();
 		if(email.isEmpty() || email == null ||
 				password.isEmpty() || password == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "Please fill required data.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}
-		WdCustomer c = WdCustomer.findByEmailAndPassword(email, password);
+		WdCustomer c = WdCustomer.findByEmail(email);
 		if(c == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}
-		HashMap<String, String> map1 = new HashMap<>();
+		if(!c.getPassword().equals(password)){
+			map.put("status", "500");
+			map.put("message", "Invalid credentials.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
+		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("CTPYE", c.getType());
 		map1.put("CustomerID", c.getId().toString());
-		return ok(Json.toJson(map1));
-		//return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
+		map.put("status", "200");
+		map.put("message", "Login successfull.");
+		map.put("data", map1);
+		return ok(Json.toJson(map));
 	}
 
 	public static Result forgotPassword(){
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		String email = data.path("email").asText();
 		WdCustomer c = WdCustomer.findByEmail(email);
 		if(c == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}else{
 			sendPasswordMail(c.getEmail(),c.getPassword());
 		}
-		return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
+		map.put("status", "200");
+		map.put("message", "Email sent with new password.");
+		map.put("data", null);
+		return ok(Json.toJson(map));
 	}
 	
 	public static Result getCustomerProfile(){
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
-		WdCustomer c = WdCustomer.findById(id); 
+		WdCustomer c = WdCustomer.findById(id);
+		if(c == null){
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
 		vm.firstName = c.getFirstname();
@@ -241,47 +266,72 @@ public class Application extends Controller {
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
-		return ok(Json.toJson(vm));
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", vm);
+		return ok(Json.toJson(map));
 	}
 	
 	public static Result changeCustomerName(){
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}
 		c.setFirstname(data.path("firstName").asText());
 		c.setLastname(data.path("lastName").asText());
 		c.update();
-		return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", null);
+		return ok(Json.toJson(map));
 	}
 	
 	public static Result changeCustomerPassword(){
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}
 		c.setPassword(data.path("password").asText());
 		c.update();
-		return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", null);
+		return ok(Json.toJson(map));
 	}
 	
 	public static Result changeCustomerAddress(){
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}
 		c.setAddress(data.path("address").asText());
 		c.update();
-		return ok(Json.toJson(new ErrorResponse(Error.E200.getCode(), Error.E200.getMessage())));
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", null);
+		return ok(Json.toJson(map));
 	}
 	
 	public static Result getMyOffers() throws Exception{
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		String lat = data.path("lat").asText();
 		String lon = data.path("long").asText();
@@ -321,9 +371,12 @@ public class Application extends Controller {
 			}
 		}
 		List<ProductVM> prods = getProducts(currentId);
-		HashMap<String, Object> map = new HashMap<>();
-		map.put("products", prods);
-		map.put("retailers", vmList);
+		HashMap<String, Object> map1 = new HashMap<>();
+		map1.put("products", prods);
+		map1.put("retailers", vmList);
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", map1);
 		return ok(Json.toJson(map));
 	}
 	
@@ -354,9 +407,16 @@ public class Application extends Controller {
 	}
 	
 	public static Result getRetailerProducts() {
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("retailerId").asLong();
 		WdRetailer w = WdRetailer.findById(id);
+		if(w == null){
+			map.put("status", "500");
+			map.put("message", "Retailer does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
 		RetailerVM vm = new RetailerVM();
 		vm.setBusinessName(w.getBusinessName());
 		vm.setStreetName(w.getStreetName());
@@ -368,9 +428,12 @@ public class Application extends Controller {
 		vm.setWorkEmail(w.getWorkEmail());
 		vm.setQistNo(w.getQistSku()+w.getSkuPostfix());
 		List<ProductVM> prods = getProducts(id);
-		HashMap<String, Object> map = new HashMap<>();
-		map.put("retailer", vm);
-		map.put("products", prods);
+		HashMap<String, Object> map1 = new HashMap<>();
+		map1.put("retailer", vm);
+		map1.put("products", prods);
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", map1);
 		return ok(Json.toJson(map));
 	}
 	
@@ -427,12 +490,16 @@ public class Application extends Controller {
 
 
 	public static Result getCustomerCart(){
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		ArrayList<ProductVM> VMs =  new ArrayList<ProductVM>();
 		if(c == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}else{
 			List <WdProduct> wdP  = c.getWdProducts();
 			for(WdProduct p: wdP){
@@ -455,18 +522,31 @@ public class Application extends Controller {
 				VMs.add(vm);
 			}
 		}
-		return ok(Json.toJson(VMs));
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", VMs);
+		return ok(Json.toJson(map));
 	}
 
 	public static Result scanProduct() throws ParseException{
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long userId = data.path("userId").asLong();
 		String qrcode = data.path("qrCode").asText();
 	
 		WdCustomer w = WdCustomer.findById(userId);
 		WdProduct p = WdProduct.findByQrCode(qrcode);
-		if(p == null || w == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+		if(w == null){
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
+		if(p == null){
+			map.put("status", "500");
+			map.put("message", "Product not found.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}
 	
 		List<WdProduct> prods = w.getWdProducts();
@@ -516,25 +596,29 @@ public class Application extends Controller {
 		vm.mfrSku = p.getMfrSku();
 		vm.storeSku = p.getStoreSku();
 		vm.qistNo = p.getQistSku()+p.getSkuPostfix();
-		return ok(Json.toJson(vm));
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", vm);
+		return ok(Json.toJson(map));
 	}
 
 	
-	public static  Result  getCustomerProductList(){
-		
+	public static  Result  getCustomerPurchaseHistory(){
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
-		System.out.println(data);
 		
 		Long userId = data.path("userId").asLong();
 		ArrayList<CustomerSessionVM> customerSessionVMs = new ArrayList<CustomerSessionVM>();
 		WdCustomer w = WdCustomer.findById(userId);
 
 		if(w == null){
-			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}else{
 			
 			List<CustomerSession>  cs = CustomerSession.getCustomerSessionByCustomerId(w);
-
 			for(CustomerSession c :  cs){
 				
 				CustomerSessionVM customerSession = new CustomerSessionVM();
@@ -577,7 +661,6 @@ public class Application extends Controller {
 				customerSession.start = c.getStart();
 				
 				List<SessionProduct> products = SessionProduct.getSessionProductByCustomerId(c);
-				System.out.println("products.size()" +products.size());
 				
 				for(SessionProduct s: products){
 					ProductVM pvm = new ProductVM();
@@ -601,7 +684,10 @@ public class Application extends Controller {
 				
 				customerSessionVMs.add(customerSession);
 			}	
-		  return ok(Json.toJson(customerSessionVMs));
+			map.put("status", "200");
+			map.put("message", "OK.");
+			map.put("data", customerSessionVMs);
+			return ok(Json.toJson(map));
 		}
 		
 	} 
