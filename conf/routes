@@ -19,3 +19,4 @@ POST	/changeCustomerPassword					controllers.Application.changeCustomerPassword(
 POST	/getMyOffers							controllers.Application.getMyOffers()
 POST	/getRetailerProducts					controllers.Application.getRetailerProducts()
 POST    /getCustomerCart	                    controllers.Application.getCustomerCart()
+POST    /getCustomerProductList                 controllers.Application.getCustomerProductList()

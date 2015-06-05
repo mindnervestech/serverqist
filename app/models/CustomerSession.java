@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import play.db.ebean.Model;
+import play.db.ebean.Model.Finder;
 
 @Entity
 public class CustomerSession extends Model{
@@ -93,6 +94,19 @@ public class CustomerSession extends Model{
 		sessionProduct.setCustomerSession(null);
 
 		return sessionProduct;
+	}
+	
+
+	public static Finder<Long, CustomerSession> find = new Finder<>(Long.class, CustomerSession.class);
+
+	
+	
+	public static CustomerSession  getCustomerSessionByRetailerAndDate(WdRetailer wdRetailer,Date d) {
+		return find.where().eq("wdRetailer", wdRetailer).eq("start", d).findUnique();
+	}
+	
+	public static List <CustomerSession>  getCustomerSessionByCustomerId(WdCustomer wdCustomer) {
+		return find.where().eq("wdCustomer", wdCustomer).order().asc("start").setMaxRows(10).findList();
 	}
 	
 }

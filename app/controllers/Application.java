@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +32,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import models.CustomerSession;
+import models.SessionProduct;
 import models.WdCustomer;
 import models.WdProduct;
 import models.WdRetailer;
@@ -44,6 +48,7 @@ import play.mvc.Controller;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
+import viewmodels.CustomerSessionVM;
 import viewmodels.CustomerVM;
 import viewmodels.ProductVM;
 import viewmodels.RetailerVM;
@@ -453,21 +458,48 @@ public class Application extends Controller {
 		return ok(Json.toJson(VMs));
 	}
 
-	public static Result scanProduct(){
+	public static Result scanProduct() throws ParseException{
 		JsonNode data = request().body().asJson();
 		Long userId = data.path("userId").asLong();
 		String qrcode = data.path("qrCode").asText();
+	
 		WdCustomer w = WdCustomer.findById(userId);
 		WdProduct p = WdProduct.findByQrCode(qrcode);
 		if(p == null || w == null){
 			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
 		}
+	
 		List<WdProduct> prods = w.getWdProducts();
 		if(!prods.contains(p)){
 			prods.add(p);
 			w.setWdProducts(prods);
 			w.save();
 		}
+		
+		
+		Date today = new Date();
+		 
+		 SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+	     String date = DATE_FORMAT.format(today);
+	     System.out.println("Today in dd/MM/yyyy format : " + date);
+		
+		CustomerSession cs = CustomerSession.getCustomerSessionByRetailerAndDate(p.getWdRetailer(),DATE_FORMAT.parse(date));
+		
+		if(cs == null){
+			cs = new CustomerSession();
+			cs.setWdRetailer(p.getWdRetailer());
+			cs.setWdCustomer(w);
+			cs.setStart(DATE_FORMAT.parse(date));
+			cs.save();
+		}
+		
+		SessionProduct sp  = new  SessionProduct() ;
+		sp.setWdProduct(p);
+		sp.setPurchased(false);
+		sp.setCustomerSession(cs);
+ 		sp.save();
+ 
+		
 		ProductVM vm = new ProductVM();
 		vm.id = p.getId();
 		vm.name = p.getName();
@@ -487,6 +519,93 @@ public class Application extends Controller {
 		return ok(Json.toJson(vm));
 	}
 
+	
+	public static  Result  getCustomerProductList(){
+		
+		JsonNode data = request().body().asJson();
+		System.out.println(data);
+		
+		Long userId = data.path("userId").asLong();
+		ArrayList<CustomerSessionVM> customerSessionVMs = new ArrayList<CustomerSessionVM>();
+		WdCustomer w = WdCustomer.findById(userId);
+
+		if(w == null){
+			return ok(Json.toJson(new ErrorResponse(Error.E500.getCode(), Error.E500.getMessage())));
+		}else{
+			
+			List<CustomerSession>  cs = CustomerSession.getCustomerSessionByCustomerId(w);
+
+			for(CustomerSession c :  cs){
+				
+				CustomerSessionVM customerSession = new CustomerSessionVM();
+				customerSession.id = c.getId();
+				
+				WdRetailer r =  c.getWdRetailer();
+                RetailerVM rvm = new RetailerVM();
+                rvm.setId(r.getId());
+                rvm.setBillingInformation(r.getBillingInformation());
+                rvm.setBusinessName(r.getBusinessName());
+                rvm.setCity(r.getCity());
+                rvm.setContactPerson(r.getContactPerson());
+                rvm.setEftpos(r.getEftpos());
+                rvm.setEftposProvider(r.getEftposProvider());
+                rvm.setFbLink(r.getFbLink());
+                rvm.setGoodsCategories(r.getGoodsCategories());
+                rvm.setGoogleLink(r.getGoogleLink());
+                rvm.setGstNo(r.getGstNo());
+                rvm.setIrNo(r.getIrNo());
+                rvm.setLogoImage(r.getLogoImage());
+                rvm.setMerchantId(r.getMerchantId());
+                rvm.setMobileNo(r.getMobileNo());
+                rvm.setPaymark(r.getPaymark());
+                rvm.setQistSku(r.getQistSku());
+                rvm.setReferedBy(r.getReferedBy());
+                rvm.setSkuPostfix(r.getSkuPostfix());
+                rvm.setStreetName(r.getStreetName());
+                rvm.setStreetNo(r.getStreetNo());
+                rvm.setSuburb(r.getSuburb());
+                rvm.setTitle(r.getTitle());
+                rvm.setTradingName(r.getTradingName());
+                rvm.setTwitterLink(r.getTwitterLink());
+                rvm.setWorkEmail(r.getWorkEmail());
+                rvm.setWorkPhone1(r.getWorkPhone1());
+                rvm.setWorkPhone2(r.getWorkPhone2());
+                rvm.setWorkUrl(r.getWorkUrl());
+                rvm.setQistNo(r.getQistSku()+r.getSkuPostfix());
+                
+                customerSession.retailerVM = rvm;
+				customerSession.start = c.getStart();
+				
+				List<SessionProduct> products = SessionProduct.getSessionProductByCustomerId(c);
+				System.out.println("products.size()" +products.size());
+				
+				for(SessionProduct s: products){
+					ProductVM pvm = new ProductVM();
+					pvm.id = s.getWdProduct().getId();
+					pvm.approvedDate = s.getWdProduct().getApprovedDate();
+					pvm.createdDate = s.getWdProduct().getCreatedDate();
+					pvm.createdTime = s.getWdProduct().getCreatedTime();
+					pvm.description = s.getWdProduct().getDescription();
+					pvm.image = s.getWdProduct().getImage();
+					pvm.isApproved =Boolean.parseBoolean(s.getWdProduct().getIsApproved());
+					pvm.mfrSku = s.getWdProduct().getMfrSku();
+					pvm.name = s.getWdProduct().getName();
+					pvm.qistNo = s.getWdProduct().getQistSku()+s.getWdProduct().getSkuPostfix();
+					pvm.qrCode = s.getWdProduct().getQrCode();
+					pvm.specifications = s.getWdProduct().getSpecifications();
+					pvm.status = s.getWdProduct().getStatus();
+					
+					
+					customerSession.products.add(pvm);	
+				}
+				
+				customerSessionVMs.add(customerSession);
+			}	
+		  return ok(Json.toJson(customerSessionVMs));
+		}
+		
+	} 
+	
 	public static void sendPasswordMail(String email,String pass) {
 		final String username = "mindnervesdemo@gmail.com";
 		final String password = "mindnervesadmin";
