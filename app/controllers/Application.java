@@ -214,9 +214,26 @@ public class Application extends Controller {
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}
+		
+		CustomerVM vm = new CustomerVM();
+		vm.id = c.getId();
+		vm.firstName = c.getFirstname();
+		vm.lastName = c.getLastname();
+		vm.email = c.getEmail();
+		vm.password = c.getPassword();
+		vm.address = c.getAddress();
+		vm.image = c.getImage();
+		vm.contactNo = c.getContactNo();
+		vm.createdDate = c.getCreatedDate();
+		vm.updatedDate = c.getUpdatedDate();
+		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
+		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+	
+		
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("CTPYE", c.getType());
 		map1.put("CustomerID", c.getId().toString());
+		map1.put("UserData",vm);
 		map.put("status", "200");
 		map.put("message", "Login successfull.");
 		map.put("data", map1);
