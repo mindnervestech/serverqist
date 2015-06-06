@@ -809,5 +809,70 @@ public class Application extends Controller {
 			e.printStackTrace();
 		} 
 	} 
+	
+	public static Result  changeCustomerProfileImage(){
+		HashMap<String, Object> map = new HashMap<>();
+		
+		DynamicForm users = Form.form().bindFromRequest();
+		long  id = Long.parseLong(users.get("userId"));
+		WdCustomer c = WdCustomer.findById(id); 
+	
+		String imageDataString = new String();
+		if(c != null){
+			MultipartFormData body = request().body().asMultipartFormData();
+			
+			if (body != null) {
+				FilePart filePart = body.getFile("image");
+				if (filePart != null) {
+					File f = filePart.getFile();
+					System.out.println("imageee file===="+f);
+                
+					try {            
+						FileInputStream imageInFile = new FileInputStream(f);
+						byte imageData[] = new byte[(int) f.length()];
+						imageInFile.read(imageData);
+						imageInFile.close();
+						imageDataString = Base64.encodeBase64URLSafeString(imageData);
+						System.out.println("imageee===="+imageDataString);
+					} catch (FileNotFoundException e) {
+						System.out.println("Image not found" + e);
+					} catch (IOException ioe) {
+						System.out.println("Exception while reading the Image " + ioe);
+					}
+
+				}
+			}
+			c.setImage(imageDataString);
+			c.update();
+			CustomerVM vm = new CustomerVM();
+			vm.id = c.getId();
+			vm.firstName = c.getFirstname();
+			vm.lastName = c.getLastname();
+			vm.email = c.getEmail();
+			vm.password = c.getPassword();
+			vm.address = c.getAddress();
+			vm.image = c.getImage();
+			vm.contactNo = c.getContactNo();
+			vm.createdDate = c.getCreatedDate();
+			vm.updatedDate = c.getUpdatedDate();
+			vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
+			vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+			
+			HashMap<String, Object> map1 = new HashMap<>();
+			map1.put("CTPYE", c.getType());
+			map1.put("CustomerID", c.getId().toString());
+			map1.put("UserData", vm);
+			map.put("status", "200");
+			map.put("message", "OK.");
+			map.put("data", map1);
+
+			return ok(Json.toJson(map));
+		}else{
+				map.put("status", "500");
+				map.put("message", "User does not exist.");
+				map.put("data", null);
+				return ok(Json.toJson(map));
+		}
+	}
 
 }
