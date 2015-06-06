@@ -180,9 +180,27 @@ public class Application extends Controller {
 		}
 		c.save();
 		
+		
+		CustomerVM vm = new CustomerVM();
+		vm.id = c.getId();
+		vm.firstName = c.getFirstname();
+		vm.lastName = c.getLastname();
+		vm.email = c.getEmail();
+		vm.password = c.getPassword();
+		vm.address = c.getAddress();
+		vm.image = c.getImage();
+		vm.contactNo = c.getContactNo();
+		vm.createdDate = c.getCreatedDate();
+		vm.updatedDate = c.getUpdatedDate();
+		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
+		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+	
+		
+		
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("CTPYE", c.getType());
 		map1.put("CustomerID", c.getId().toString());
+		map1.put("UserData", vm);
 		map.put("status", "200");
 		map.put("message", "OK.");
 		map.put("data", map1);
@@ -303,9 +321,25 @@ public class Application extends Controller {
 		c.setFirstname(data.path("firstName").asText());
 		c.setLastname(data.path("lastName").asText());
 		c.update();
+		
+		CustomerVM vm = new CustomerVM();
+		vm.id = c.getId();
+		vm.firstName = c.getFirstname();
+		vm.lastName = c.getLastname();
+		vm.email = c.getEmail();
+		vm.password = c.getPassword();
+		vm.address = c.getAddress();
+		vm.image = c.getImage();
+		vm.contactNo = c.getContactNo();
+		vm.createdDate = c.getCreatedDate();
+		vm.updatedDate = c.getUpdatedDate();
+		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
+		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+		
+		
 		map.put("status", "200");
 		map.put("message", "OK.");
-		map.put("data", null);
+		map.put("data", vm);
 		return ok(Json.toJson(map));
 	}
 	
@@ -322,9 +356,25 @@ public class Application extends Controller {
 		}
 		c.setPassword(data.path("password").asText());
 		c.update();
+		
+		CustomerVM vm = new CustomerVM();
+		vm.id = c.getId();
+		vm.firstName = c.getFirstname();
+		vm.lastName = c.getLastname();
+		vm.email = c.getEmail();
+		vm.password = c.getPassword();
+		vm.address = c.getAddress();
+		vm.image = c.getImage();
+		vm.contactNo = c.getContactNo();
+		vm.createdDate = c.getCreatedDate();
+		vm.updatedDate = c.getUpdatedDate();
+		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
+		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+		
+		
 		map.put("status", "200");
 		map.put("message", "OK.");
-		map.put("data", null);
+		map.put("data", vm);
 		return ok(Json.toJson(map));
 	}
 	
@@ -341,9 +391,24 @@ public class Application extends Controller {
 		}
 		c.setAddress(data.path("address").asText());
 		c.update();
+		
+		CustomerVM vm = new CustomerVM();
+		vm.id = c.getId();
+		vm.firstName = c.getFirstname();
+		vm.lastName = c.getLastname();
+		vm.email = c.getEmail();
+		vm.password = c.getPassword();
+		vm.address = c.getAddress();
+		vm.image = c.getImage();
+		vm.contactNo = c.getContactNo();
+		vm.createdDate = c.getCreatedDate();
+		vm.updatedDate = c.getUpdatedDate();
+		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
+		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+		
 		map.put("status", "200");
 		map.put("message", "OK.");
-		map.put("data", null);
+		map.put("data", vm);
 		return ok(Json.toJson(map));
 	}
 	
@@ -417,7 +482,7 @@ public class Application extends Controller {
 			vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
 			vm.mfrSku = p.getMfrSku();
 			vm.storeSku = p.getStoreSku();
-			vm.qistNo = p.getQistSku()+p.getSkuPostfix();
+			vm.qistNo = p.getQistSku() + p.getSkuPostfix();
 			plist.add(vm);
 		}
 		return plist;
