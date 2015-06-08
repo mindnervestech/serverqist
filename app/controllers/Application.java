@@ -337,8 +337,8 @@ public class Application extends Controller {
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}
-		c.setFirstname(data.path("firstName").asText());
-		c.setLastname(data.path("lastName").asText());
+		c.setFirstname(data.path("name").asText());
+		//c.setLastname(data.path("lastName").asText());
 		c.update();
 		
 		CustomerVM vm = new CustomerVM();
