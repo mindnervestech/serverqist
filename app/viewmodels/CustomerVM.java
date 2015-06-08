@@ -23,4 +23,6 @@ public class CustomerVM {
 	public Date createdDate;
 	public Date updatedDate;
 	
+	public String name;
+	
 }

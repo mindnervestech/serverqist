@@ -3,6 +3,7 @@ package controllers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -41,6 +42,7 @@ import models.WdRetailer;
 import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Document;
 
+import play.Play;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.libs.Json;
@@ -69,6 +71,9 @@ public class Application extends Controller {
 	public static Result register(){
 		HashMap<String, Object> map = new HashMap<>();
 		DynamicForm users = Form.form().bindFromRequest();
+		final String BASE_URL_PATH = Play.application().configuration()
+				.getString("url");
+		
 		String fname = users.get("firstName");
 		String lname = users.get("lastName");
 		String email = users.get("email");
@@ -113,16 +118,9 @@ public class Application extends Controller {
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}
-		WdCustomer cus = WdCustomer.findByEmail(email);
-		if(cus != null){
-			map.put("status", "500");
-			map.put("message", "User already exists.");
-			map.put("data", null);
-			return ok(Json.toJson(map));
-		}
 
-		c.setFirstname(fname);
-		c.setLastname(lname);
+		c.setFirstname(fname  +" "+  lname);
+		//c.setLastname(lname);
 		c.setEmail(email);
 		c.setPassword(pass);
 		c.setAddress(address);
@@ -178,17 +176,26 @@ public class Application extends Controller {
 				c.setType("S");
 			}	
 		}
+		
+		WdCustomer cus = WdCustomer.findByEmail(email);
+		if(cus != null){
+			map.put("status", "500");
+			map.put("message", "User already exists.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
+		
 		c.save();
 		
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.firstName = c.getFirstname();
-		vm.lastName = c.getLastname();
+		vm.name = (c.getFirstname() +" "+ c.getLastname());
+		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = c.getImage();
+		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -210,6 +217,9 @@ public class Application extends Controller {
 	public static Result login(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
+		final String BASE_URL_PATH = Play.application().configuration()
+				.getString("url");
+		
 		String email = data.path("email").asText();
 		String password = data.path("password").asText();
 		if(email.isEmpty() || email == null ||
@@ -235,12 +245,12 @@ public class Application extends Controller {
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.firstName = c.getFirstname();
-		vm.lastName = c.getLastname();
+	    vm.name = (c.getFirstname() +" "+ c.getLastname());
+		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = c.getImage();
+		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -261,6 +271,8 @@ public class Application extends Controller {
 	public static Result forgotPassword(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
+		
+		
 		String email = data.path("email").asText();
 		WdCustomer c = WdCustomer.findByEmail(email);
 		if(c == null){
@@ -280,6 +292,9 @@ public class Application extends Controller {
 	public static Result getCustomerProfile(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
+		final String BASE_URL_PATH = Play.application().configuration()
+				.getString("url");
+		
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id);
 		if(c == null){
@@ -290,12 +305,13 @@ public class Application extends Controller {
 		}
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.firstName = c.getFirstname();
-		vm.lastName = c.getLastname();
+		vm.name = (c.getFirstname() +" "+ c.getLastname());
+		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = c.getImage();
+	
+		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -310,6 +326,9 @@ public class Application extends Controller {
 	public static Result changeCustomerName(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
+		final String BASE_URL_PATH = Play.application().configuration()
+				.getString("url");
+		
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
@@ -324,12 +343,12 @@ public class Application extends Controller {
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.firstName = c.getFirstname();
-		vm.lastName = c.getLastname();
+		vm.name = (c.getFirstname() +" "+ c.getLastname());
+		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = c.getImage();
+		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -347,6 +366,8 @@ public class Application extends Controller {
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
+		final String BASE_URL_PATH = Play.application().configuration()
+				.getString("url");
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
 			map.put("status", "500");
@@ -359,18 +380,17 @@ public class Application extends Controller {
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.firstName = c.getFirstname();
-		vm.lastName = c.getLastname();
+		vm.name =(c.getFirstname() +" "+ c.getLastname());
+		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = c.getImage();
+		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
-		
 		
 		map.put("status", "200");
 		map.put("message", "OK.");
@@ -380,6 +400,10 @@ public class Application extends Controller {
 	
 	public static Result changeCustomerAddress(){
 		HashMap<String, Object> map = new HashMap<>();
+		
+		final String BASE_URL_PATH = Play.application().configuration()
+				.getString("url");
+		
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
@@ -394,12 +418,12 @@ public class Application extends Controller {
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.firstName = c.getFirstname();
-		vm.lastName = c.getLastname();
+		vm.name =(c.getFirstname() +" "+ c.getLastname());
+		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = c.getImage();
+		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -760,7 +784,6 @@ public class Application extends Controller {
 					pvm.specifications = s.getWdProduct().getSpecifications();
 					pvm.status = s.getWdProduct().getStatus();
 					
-					
 					customerSession.products.add(pvm);	
 				}
 				
@@ -810,10 +833,11 @@ public class Application extends Controller {
 		} 
 	} 
 	
-	public static Result  changeCustomerProfileImage(){
+	public static Result  changeCustomerProfileImage() throws IOException{
 		HashMap<String, Object> map = new HashMap<>();
-		
 		DynamicForm users = Form.form().bindFromRequest();
+		final String BASE_URL_PATH = Play.application().configuration()
+				.getString("url");		
 		long  id = Long.parseLong(users.get("userId"));
 		WdCustomer c = WdCustomer.findById(id); 
 	
@@ -846,12 +870,12 @@ public class Application extends Controller {
 			c.update();
 			CustomerVM vm = new CustomerVM();
 			vm.id = c.getId();
-			vm.firstName = c.getFirstname();
-			vm.lastName = c.getLastname();
+			vm.name =(c.getFirstname() +" "+ c.getLastname());
+			//vm.lastName = c.getLastname();
 			vm.email = c.getEmail();
 			vm.password = c.getPassword();
 			vm.address = c.getAddress();
-			vm.image = c.getImage();
+			vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
 			vm.contactNo = c.getContactNo();
 			vm.createdDate = c.getCreatedDate();
 			vm.updatedDate = c.getUpdatedDate();
@@ -872,6 +896,32 @@ public class Application extends Controller {
 				map.put("message", "User does not exist.");
 				map.put("data", null);
 				return ok(Json.toJson(map));
+		}
+	}
+	
+	
+	public static Result getCustomerProfileImage(Long id) throws IOException{
+		WdCustomer c = WdCustomer.findById(id); 
+		
+		 String outFolderPath = Play.application().path().getAbsolutePath() +"/images";
+         File outFolder = new File(outFolderPath);
+
+         if (!outFolder.exists()) {
+                 outFolder.mkdir();
+         }
+         
+         File f = new File(outFolderPath+"/"+c.getFirstname() + "_" +  c.getLastname() +".png");
+		  if( c !=  null){
+			byte[] encoded = Base64.decodeBase64(c.getImage());
+			
+			FileOutputStream imageOutFile = new FileOutputStream(f);
+			imageOutFile.write(encoded);
+			imageOutFile.close();
+			FileInputStream fis = new FileInputStream(f);
+			return ok(fis).as(("picture/stream"));
+			
+		}else{
+			return ok();
 		}
 	}
 
