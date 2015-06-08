@@ -910,15 +910,18 @@ public class Application extends Controller {
                  outFolder.mkdir();
          }
          
-         File f = new File(outFolderPath+"/"+c.getFirstname() + "_" +  c.getLastname() +".png");
+         File f = new File(outFolderPath+"/"+c.getFirstname() +".png");
 		  if( c !=  null){
-			byte[] encoded = Base64.decodeBase64(c.getImage());
-			
-			FileOutputStream imageOutFile = new FileOutputStream(f);
-			imageOutFile.write(encoded);
-			imageOutFile.close();
-			FileInputStream fis = new FileInputStream(f);
-			return ok(fis).as(("picture/stream"));
+			  if(c.getImage() !=  null){
+				  byte[] encoded = Base64.decodeBase64(c.getImage());
+					FileOutputStream imageOutFile = new FileOutputStream(f);
+					imageOutFile.write(encoded);
+					imageOutFile.close();
+					FileInputStream fis = new FileInputStream(f);
+					return ok(fis).as(("picture/stream"));
+			  }else{
+				  return ok();
+			  }
 			
 		}else{
 			return ok();
