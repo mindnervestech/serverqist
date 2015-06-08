@@ -105,6 +105,7 @@ public class Application extends Controller {
 				}
 			}
 		}
+		
 		if(fname.isEmpty() || fname == null ||
 				lname.isEmpty() || lname == null){
 			map.put("status", "500");
@@ -135,9 +136,24 @@ public class Application extends Controller {
 		if(FacebookId != null && !FacebookId.isEmpty()){
 			WdCustomer cc = WdCustomer.findByFbId(FacebookId);
 			if(cc != null){
+				CustomerVM vm = new CustomerVM();
+				vm.id = cc.getId();
+				vm.name = (cc.getFirstname());
+				//vm.lastName = c.getLastname();
+				vm.email = cc.getEmail();
+				vm.password = cc.getPassword();
+				vm.address = cc.getAddress();
+				vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + cc.getId();
+				vm.contactNo = cc.getContactNo();
+				vm.createdDate = cc.getCreatedDate();
+				vm.updatedDate = cc.getUpdatedDate();
+				vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
+				vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
+				
 				HashMap<String, Object> map1 = new HashMap<>();
 				map1.put("CTPYE", "S");
 				map1.put("CustomerID", cc.getId().toString());
+				map1.put("UserData",vm);
 				map.put("status", "200");
 				map.put("message", "OK.");
 				map.put("data", map1);
@@ -150,9 +166,25 @@ public class Application extends Controller {
 		} else if(GooglePlusId != null && !GooglePlusId.isEmpty()){
 			WdCustomer cc = WdCustomer.findByGoogleID(GooglePlusId);
 			if(cc != null){
+				
+				CustomerVM vm = new CustomerVM();
+				vm.id = cc.getId();
+				vm.name = (cc.getFirstname());
+				//vm.lastName = c.getLastname();
+				vm.email = cc.getEmail();
+				vm.password = cc.getPassword();
+				vm.address = cc.getAddress();
+				vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + cc.getId();
+				vm.contactNo = cc.getContactNo();
+				vm.createdDate = cc.getCreatedDate();
+				vm.updatedDate = cc.getUpdatedDate();
+				vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
+				vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
+				
 				HashMap<String, Object> map1 = new HashMap<>();
 				map1.put("CTPYE", "S");
 				map1.put("CustomerID", cc.getId().toString());
+				map1.put("UserData",vm);
 				map.put("status", "200");
 				map.put("message", "OK.");
 				map.put("data", map1);
@@ -164,9 +196,24 @@ public class Application extends Controller {
 		} else if(TwitterId != null && !TwitterId.isEmpty()){
 			WdCustomer cc = WdCustomer.findByTwitterId(TwitterId);
 			if(cc != null){
+				CustomerVM vm = new CustomerVM();
+				vm.id = cc.getId();
+				vm.name = (cc.getFirstname());
+				//vm.lastName = c.getLastname();
+				vm.email = cc.getEmail();
+				vm.password = cc.getPassword();
+				vm.address = cc.getAddress();
+				vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + cc.getId();
+				vm.contactNo = cc.getContactNo();
+				vm.createdDate = cc.getCreatedDate();
+				vm.updatedDate = cc.getUpdatedDate();
+				vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
+				vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
+				
 				HashMap<String, Object> map1 = new HashMap<>();
 				map1.put("CTPYE", "S");
 				map1.put("CustomerID", cc.getId().toString());
+				map1.put("UserData",vm);
 				map.put("status", "200");
 				map.put("message", "OK.");
 				map.put("data", map1);
@@ -190,7 +237,7 @@ public class Application extends Controller {
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.name = (c.getFirstname() +" "+ c.getLastname());
+		vm.name = (c.getFirstname());
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
@@ -245,7 +292,7 @@ public class Application extends Controller {
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-	    vm.name = (c.getFirstname() +" "+ c.getLastname());
+	    vm.name = (c.getFirstname());
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
@@ -305,12 +352,11 @@ public class Application extends Controller {
 		}
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.name = (c.getFirstname() +" "+ c.getLastname());
+		vm.name = (c.getFirstname());
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-	
 		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
@@ -326,6 +372,7 @@ public class Application extends Controller {
 	public static Result changeCustomerName(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
+	
 		final String BASE_URL_PATH = Play.application().configuration()
 				.getString("url");
 		
@@ -343,7 +390,7 @@ public class Application extends Controller {
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.name = (c.getFirstname() +" "+ c.getLastname());
+		vm.name = (c.getFirstname());
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
@@ -380,7 +427,7 @@ public class Application extends Controller {
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.name =(c.getFirstname() +" "+ c.getLastname());
+		vm.name =(c.getFirstname());
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
@@ -418,7 +465,7 @@ public class Application extends Controller {
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-		vm.name =(c.getFirstname() +" "+ c.getLastname());
+		vm.name =(c.getFirstname());
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
@@ -870,7 +917,7 @@ public class Application extends Controller {
 			c.update();
 			CustomerVM vm = new CustomerVM();
 			vm.id = c.getId();
-			vm.name =(c.getFirstname() +" "+ c.getLastname());
+			vm.name =(c.getFirstname());
 			//vm.lastName = c.getLastname();
 			vm.email = c.getEmail();
 			vm.password = c.getPassword();
