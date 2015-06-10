@@ -226,12 +226,14 @@ public class Application extends Controller {
 			}	
 		}
 		
-		WdCustomer cus = WdCustomer.findByEmail(email);
-		if(cus != null){
-			map.put("status", "500");
-			map.put("message", "User already exists.");
-			map.put("data", null);
-			return ok(Json.toJson(map));
+		if(c.getType().equals("M")){
+			WdCustomer cus = WdCustomer.findByEmail(email);
+			if(cus != null){
+				map.put("status", "500");
+				map.put("message", "User already exists.");
+				map.put("data", null);
+				return ok(Json.toJson(map));
+			}
 		}
 		
 		c.save();
