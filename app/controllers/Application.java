@@ -113,11 +113,13 @@ public class Application extends Controller {
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}
-		if(!pass.equals(repass)){
-			map.put("status", "500");
-			map.put("message", "Passwords don't match.");
-			map.put("data", null);
-			return ok(Json.toJson(map));
+		if(pass != null){
+			if(!pass.equals(repass)){
+				map.put("status", "500");
+				map.put("message", "Passwords don't match.");
+				map.put("data", null);
+				return ok(Json.toJson(map));
+			}
 		}
 
 		c.setFirstname(fname  +" "+  lname);
