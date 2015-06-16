@@ -67,17 +67,18 @@ public class Application extends Controller {
 	
 	private static final double dist = 5.0;
 	final static String FILEPATH = Play.application().configuration().getString("filePath");
+	final static String DOMAIN_URL = Play.application().configuration().getString("domainUrl");
 	
 	public static Result index() {
 		return ok(index.render("Your new application is ready."));
 	}
 
 	public static Result register(){
-		File folder = new File(Play.application().path().getAbsolutePath()+"/uploads");
+		File folder = new File(FILEPATH);
 		if(!folder.exists()){
 			folder.mkdir();
 		}
-		File subFolder = new File(Play.application().path().getAbsolutePath()+"/uploads/customers");
+		File subFolder = new File(FILEPATH + "/customers");
 		if(!subFolder.exists()){
 			subFolder.mkdir();
 		}
@@ -114,7 +115,7 @@ public class Application extends Controller {
 					vm.email = cc.getEmail();
 					vm.password = cc.getPassword();
 					vm.address = cc.getAddress();
-					vm.image = FILEPATH + "/customers/" +cc.getImage();
+					vm.image = DOMAIN_URL+"getCustomerProfileImage/"+cc.getId();
 					vm.contactNo = cc.getContactNo();
 					vm.createdDate = cc.getCreatedDate();
 					vm.updatedDate = cc.getUpdatedDate();
@@ -146,7 +147,7 @@ public class Application extends Controller {
 					vm.email = cc.getEmail();
 					vm.password = cc.getPassword();
 					vm.address = cc.getAddress();
-					vm.image = FILEPATH + "/customers/" +cc.getImage();
+					vm.image = DOMAIN_URL+"getCustomerProfileImage/"+cc.getId();
 					vm.contactNo = cc.getContactNo();
 					vm.createdDate = cc.getCreatedDate();
 					vm.updatedDate = cc.getUpdatedDate();
@@ -178,7 +179,7 @@ public class Application extends Controller {
 					vm.email = cc.getEmail();
 					vm.password = cc.getPassword();
 					vm.address = cc.getAddress();
-					vm.image = FILEPATH + "/customers/" +cc.getImage();
+					vm.image = DOMAIN_URL+"getCustomerProfileImage/"+cc.getId();
 					vm.contactNo = cc.getContactNo();
 					vm.createdDate = cc.getCreatedDate();
 					vm.updatedDate = cc.getUpdatedDate();
@@ -200,56 +201,6 @@ public class Application extends Controller {
 					c.setTwitterid(TwitterId);
 					c.setType("S");
 				}	
-			}
-			MultipartFormData body = request().body().asMultipartFormData();
-			if (body != null) {
-				FilePart filePart = body.getFile("image");
-				if (filePart != null) {
-					File f = filePart.getFile();
-					try {      
-						FileInputStream is = new FileInputStream(f);
-						File file = new File(Play.application().path().getAbsolutePath()+"/uploads/customers/"+filePart.getFilename());
-						int read = 0;
-						byte[] bytes = new byte[1024];
-						FileOutputStream os = new FileOutputStream(file);
-						while ((read = is.read(bytes)) != -1) {
-							os.write(bytes, 0, read);
-						}
-						os.close();
-						imageDataString = filePart.getFilename();
-						//FileInputStream imageInFile = new FileInputStream(f);
-						//byte imageData[] = new byte[(int) f.length()];
-						//imageInFile.read(imageData);
-						//imageInFile.close();
-						//imageDataString = Base64.encodeBase64URLSafeString(imageData);
-					} catch (FileNotFoundException e) {
-						System.out.println("Image not found" + e);
-					} catch (IOException ioe) {
-						System.out.println("Exception while reading the Image " + ioe);
-					}
-				}
-			} else if(imageUrl != null && !imageUrl.isEmpty()){
-				try {
-					URL url = new URL(imageUrl);
-					String fileName = url.getFile();
-					String destName = Play.application().path().getAbsolutePath()+"/uploads/customers/"+fileName.substring(fileName.lastIndexOf("/")+1);
-				 
-					InputStream is = url.openStream();
-					OutputStream os = new FileOutputStream(destName);
-				 
-					byte[] b = new byte[2048];
-					int length;
-				 
-					while ((length = is.read(b)) != -1) {
-							os.write(b, 0, length);
-					}
-					
-					is.close();
-					os.close();
-					imageDataString = fileName.substring(fileName.lastIndexOf("/")+1);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 			}
 		} else {
 			if(fname == null || fname.isEmpty() ||
@@ -293,6 +244,69 @@ public class Application extends Controller {
 		
 		c.save();
 	
+		MultipartFormData body = request().body().asMultipartFormData();
+		if (body != null) {
+			FilePart filePart = body.getFile("image");
+			if (filePart != null) {
+				File f = filePart.getFile();
+				try {      
+					FileInputStream is = new FileInputStream(f);
+					File cusFolder = new File(FILEPATH+"/customers/"+c.getId()+"/");
+					if(!cusFolder.exists()){
+						cusFolder.mkdir();
+					}
+					File file = new File(FILEPATH+"/customers/"+c.getId()+"/"+filePart.getFilename());
+					int read = 0;
+					byte[] bytes = new byte[1024];
+					FileOutputStream os = new FileOutputStream(file);
+					while ((read = is.read(bytes)) != -1) {
+						os.write(bytes, 0, read);
+					}
+					os.close();
+					imageDataString = filePart.getFilename();
+					//FileInputStream imageInFile = new FileInputStream(f);
+					//byte imageData[] = new byte[(int) f.length()];
+					//imageInFile.read(imageData);
+					//imageInFile.close();
+					//imageDataString = Base64.encodeBase64URLSafeString(imageData);
+				} catch (FileNotFoundException e) {
+					System.out.println("Image not found" + e);
+				} catch (IOException ioe) {
+					System.out.println("Exception while reading the Image " + ioe);
+				}
+			}
+		}  
+		if(imageUrl != null && !imageUrl.isEmpty()){
+			try {
+				URL url = new URL(imageUrl);
+				String fileName = url.getFile();
+				
+				File cusFolder = new File(FILEPATH+"/customers/"+c.getId()+"/");
+				if(!cusFolder.exists()){
+					cusFolder.mkdir();
+				}
+				
+				String destName = FILEPATH+"/customers/"+c.getId()+"/"+fileName.substring(fileName.lastIndexOf("/")+1);
+				
+				InputStream is = url.openStream();
+				OutputStream os = new FileOutputStream(destName);
+			 
+				byte[] b = new byte[2048];
+				int length;
+			 
+				while ((length = is.read(b)) != -1) {
+						os.write(b, 0, length);
+				}
+				
+				is.close();
+				os.close();
+				imageDataString = fileName.substring(fileName.lastIndexOf("/")+1);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		c.setImage(imageDataString);
 		c.setSkuPostfix((int)(long)c.getId());
 		c.update();
 		
@@ -303,7 +317,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers/" +c.getImage();
+		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -354,7 +368,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers/" +c.getImage();
+		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -415,7 +429,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers/" +c.getImage();;
+		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -451,7 +465,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers/" +c.getImage();;
+		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -486,7 +500,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers/" +c.getImage();;
+		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -522,7 +536,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers/" +c.getImage();;
+		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -953,7 +967,11 @@ public class Application extends Controller {
 					File f = filePart.getFile();
 					try {         
 						FileInputStream is = new FileInputStream(f);
-						File file = new File(Play.application().path().getAbsolutePath()+"/uploads/customers/"+filePart.getFilename());
+						File cusFolder = new File(FILEPATH+"/customers/"+c.getId()+"/");
+						if(!cusFolder.exists()){
+							cusFolder.mkdir();
+						}
+						File file = new File(FILEPATH+"/customers/"+c.getId()+"/"+filePart.getFilename());
 						int read = 0;
 						byte[] bytes = new byte[1024];
 						FileOutputStream os = new FileOutputStream(file);
@@ -984,7 +1002,7 @@ public class Application extends Controller {
 			vm.email = c.getEmail();
 			vm.password = c.getPassword();
 			vm.address = c.getAddress();
-			vm.image = FILEPATH + "/customers/" +c.getImage();
+			vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 			vm.contactNo = c.getContactNo();
 			vm.createdDate = c.getCreatedDate();
 			vm.updatedDate = c.getUpdatedDate();
@@ -1010,23 +1028,11 @@ public class Application extends Controller {
 	
 	public static Result getCustomerProfileImage(Long id) throws IOException{
 		WdCustomer c = WdCustomer.findById(id); 
-		String outFolderPath = Play.application().path().getAbsolutePath() +"/images";
-		File outFolder = new File(outFolderPath);
-		if (!outFolder.exists()) {
-			outFolder.mkdir();
+		if(c == null){
+			return ok();
 		}
-		File f = new File(outFolderPath+"/"+c.getFirstname() +".png");
-		if( c !=  null){
-			if(c.getImage() !=  null){
-				byte[] encoded = Base64.decodeBase64(c.getImage());
-				FileOutputStream imageOutFile = new FileOutputStream(f);
-				imageOutFile.write(encoded);
-				imageOutFile.close();
-				FileInputStream fis = new FileInputStream(f);
-				return ok(fis).as(("picture/stream"));
-			}
-		}
-		return ok();
+		File f = new File(FILEPATH+"/customers/"+c.getId()+"/"+c.getImage());
+		return ok(f);
 	}
 
 }
