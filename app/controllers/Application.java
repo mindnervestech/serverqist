@@ -114,7 +114,7 @@ public class Application extends Controller {
 					vm.email = cc.getEmail();
 					vm.password = cc.getPassword();
 					vm.address = cc.getAddress();
-					vm.image = FILEPATH + "/customers" +cc.getImage();
+					vm.image = FILEPATH + "/customers/" +cc.getImage();
 					vm.contactNo = cc.getContactNo();
 					vm.createdDate = cc.getCreatedDate();
 					vm.updatedDate = cc.getUpdatedDate();
@@ -146,7 +146,7 @@ public class Application extends Controller {
 					vm.email = cc.getEmail();
 					vm.password = cc.getPassword();
 					vm.address = cc.getAddress();
-					vm.image = FILEPATH + "/customers" +cc.getImage();
+					vm.image = FILEPATH + "/customers/" +cc.getImage();
 					vm.contactNo = cc.getContactNo();
 					vm.createdDate = cc.getCreatedDate();
 					vm.updatedDate = cc.getUpdatedDate();
@@ -178,7 +178,7 @@ public class Application extends Controller {
 					vm.email = cc.getEmail();
 					vm.password = cc.getPassword();
 					vm.address = cc.getAddress();
-					vm.image = FILEPATH + "/customers" +cc.getImage();
+					vm.image = FILEPATH + "/customers/" +cc.getImage();
 					vm.contactNo = cc.getContactNo();
 					vm.createdDate = cc.getCreatedDate();
 					vm.updatedDate = cc.getUpdatedDate();
@@ -232,7 +232,7 @@ public class Application extends Controller {
 				try {
 					URL url = new URL(imageUrl);
 					String fileName = url.getFile();
-					String destName = Play.application().path().getAbsolutePath()+"/uploads/customers/"+fileName.substring(fileName.lastIndexOf("/"));
+					String destName = Play.application().path().getAbsolutePath()+"/uploads/customers/"+fileName.substring(fileName.lastIndexOf("/")+1);
 				 
 					InputStream is = url.openStream();
 					OutputStream os = new FileOutputStream(destName);
@@ -246,7 +246,7 @@ public class Application extends Controller {
 					
 					is.close();
 					os.close();
-					imageDataString = fileName.substring(fileName.lastIndexOf("/"));
+					imageDataString = fileName.substring(fileName.lastIndexOf("/")+1);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -303,7 +303,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers" +c.getImage();
+		vm.image = FILEPATH + "/customers/" +c.getImage();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -354,7 +354,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers" +c.getImage();
+		vm.image = FILEPATH + "/customers/" +c.getImage();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -415,7 +415,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers" +c.getImage();;
+		vm.image = FILEPATH + "/customers/" +c.getImage();;
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -451,7 +451,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers" +c.getImage();;
+		vm.image = FILEPATH + "/customers/" +c.getImage();;
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -486,7 +486,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers" +c.getImage();;
+		vm.image = FILEPATH + "/customers/" +c.getImage();;
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -522,7 +522,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = FILEPATH + "/customers" +c.getImage();;
+		vm.image = FILEPATH + "/customers/" +c.getImage();;
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -984,7 +984,7 @@ public class Application extends Controller {
 			vm.email = c.getEmail();
 			vm.password = c.getPassword();
 			vm.address = c.getAddress();
-			vm.image = FILEPATH + "/customers" +c.getImage();
+			vm.image = FILEPATH + "/customers/" +c.getImage();
 			vm.contactNo = c.getContactNo();
 			vm.createdDate = c.getCreatedDate();
 			vm.updatedDate = c.getUpdatedDate();
