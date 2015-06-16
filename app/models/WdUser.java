@@ -45,6 +45,14 @@ public class WdUser extends Model {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="update_on")
 	private Date updateOn;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="last_active")
+	private Date lastActive;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="approved_date")
+	private Date approvedDate;
 
 	@Column(name="user_type")
 	private String userType;
@@ -159,7 +167,21 @@ public class WdUser extends Model {
 
 		return wdStaff;
 	}
-	
-	
 
+	public Date getLastActive() {
+		return lastActive;
+	}
+
+	public void setLastActive(Date lastActive) {
+		this.lastActive = lastActive;
+	}
+
+	public Date getApprovedDate() {
+		return approvedDate;
+	}
+
+	public void setApprovedDate(Date approvedDate) {
+		this.approvedDate = approvedDate;
+	}
+	
 }

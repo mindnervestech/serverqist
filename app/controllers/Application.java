@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -37,6 +39,7 @@ import models.CustomerSession;
 import models.SessionProduct;
 import models.WdCustomer;
 import models.WdProduct;
+import models.WdProductImage;
 import models.WdRetailer;
 
 import org.apache.commons.codec.binary.Base64;
@@ -63,17 +66,25 @@ public class Application extends Controller {
 	//private static final String URL = "http://maps.googleapis.com/maps/api/geocode/json";
 	
 	private static final double dist = 5.0;
+	final static String FILEPATH = Play.application().configuration().getString("filePath");
 	
 	public static Result index() {
 		return ok(index.render("Your new application is ready."));
 	}
 
 	public static Result register(){
+		File folder = new File(Play.application().path().getAbsolutePath()+"/uploads");
+		if(!folder.exists()){
+			folder.mkdir();
+		}
+		File subFolder = new File(Play.application().path().getAbsolutePath()+"/uploads/customers");
+		if(!subFolder.exists()){
+			subFolder.mkdir();
+		}
+		
 		HashMap<String, Object> map = new HashMap<>();
 		DynamicForm users = Form.form().bindFromRequest();
-		final String BASE_URL_PATH = Play.application().configuration()
-				.getString("url");
-		
+
 		String fname = users.get("firstName");
 		String lname = users.get("lastName");
 		String email = users.get("email");
@@ -85,148 +96,177 @@ public class Application extends Controller {
 		String FacebookId = users.get("FacebookId");
 		String GooglePlusId = users.get("GooglePlusId");
 		String TwitterId = users.get("TwitterId");
+		String imageUrl = users.get("imageUrl");
 		String imageDataString = null ;
+		
 		WdCustomer c = new WdCustomer();
-		MultipartFormData body = request().body().asMultipartFormData();
-		if (body != null) {
-			FilePart filePart = body.getFile("image");
-			if (filePart != null) {
-				File f = filePart.getFile();
-				try {            
-					FileInputStream imageInFile = new FileInputStream(f);
-					byte imageData[] = new byte[(int) f.length()];
-					imageInFile.read(imageData);
-					imageInFile.close();
-					imageDataString = Base64.encodeBase64URLSafeString(imageData);
-				} catch (FileNotFoundException e) {
-					System.out.println("Image not found" + e);
-				} catch (IOException ioe) {
-					System.out.println("Exception while reading the Image " + ioe);
+		
+		if((FacebookId != null && !FacebookId.isEmpty()) || (GooglePlusId != null && !GooglePlusId.isEmpty()) 
+				|| (TwitterId != null && !TwitterId.isEmpty())){
+			
+			if(FacebookId != null && !FacebookId.isEmpty()){
+				WdCustomer cc = WdCustomer.findByFbId(FacebookId);
+				if(cc != null){
+					CustomerVM vm = new CustomerVM();
+					vm.id = cc.getId();
+					vm.name = (cc.getFirstname());
+					//vm.lastName = c.getLastname();
+					vm.email = cc.getEmail();
+					vm.password = cc.getPassword();
+					vm.address = cc.getAddress();
+					vm.image = FILEPATH + "/customers" +cc.getImage();
+					vm.contactNo = cc.getContactNo();
+					vm.createdDate = cc.getCreatedDate();
+					vm.updatedDate = cc.getUpdatedDate();
+					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
+					vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
+					
+					cc.setLastActive(new Date());
+					cc.update();
+					
+					HashMap<String, Object> map1 = new HashMap<>();
+					map1.put("CTPYE", "S");
+					map1.put("CustomerID", cc.getId().toString());
+					map1.put("UserData",vm);
+					map.put("status", "200");
+					map.put("message", "OK.");
+					map.put("data", map1);
+					return ok(Json.toJson(map));
+				}else{
+					c.setFacebookid(FacebookId);
+					c.setType("S");
+				}
+			} else if(GooglePlusId != null && !GooglePlusId.isEmpty()){
+				WdCustomer cc = WdCustomer.findByGoogleID(GooglePlusId);
+				if(cc != null){
+					CustomerVM vm = new CustomerVM();
+					vm.id = cc.getId();
+					vm.name = (cc.getFirstname());
+					//vm.lastName = c.getLastname();
+					vm.email = cc.getEmail();
+					vm.password = cc.getPassword();
+					vm.address = cc.getAddress();
+					vm.image = FILEPATH + "/customers" +cc.getImage();
+					vm.contactNo = cc.getContactNo();
+					vm.createdDate = cc.getCreatedDate();
+					vm.updatedDate = cc.getUpdatedDate();
+					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
+					vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
+					
+					cc.setLastActive(new Date());
+					cc.update();
+					
+					HashMap<String, Object> map1 = new HashMap<>();
+					map1.put("CTPYE", "S");
+					map1.put("CustomerID", cc.getId().toString());
+					map1.put("UserData",vm);
+					map.put("status", "200");
+					map.put("message", "OK.");
+					map.put("data", map1);
+					return ok(Json.toJson(map));
+				}else{
+					c.setGoogleplusid(GooglePlusId);
+					c.setType("S");
+				}
+			} else if(TwitterId != null && !TwitterId.isEmpty()){
+				WdCustomer cc = WdCustomer.findByTwitterId(TwitterId);
+				if(cc != null){
+					CustomerVM vm = new CustomerVM();
+					vm.id = cc.getId();
+					vm.name = (cc.getFirstname());
+					//vm.lastName = c.getLastname();
+					vm.email = cc.getEmail();
+					vm.password = cc.getPassword();
+					vm.address = cc.getAddress();
+					vm.image = FILEPATH + "/customers" +cc.getImage();
+					vm.contactNo = cc.getContactNo();
+					vm.createdDate = cc.getCreatedDate();
+					vm.updatedDate = cc.getUpdatedDate();
+					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
+					vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
+					
+					cc.setLastActive(new Date());
+					cc.update();
+					
+					HashMap<String, Object> map1 = new HashMap<>();
+					map1.put("CTPYE", "S");
+					map1.put("CustomerID", cc.getId().toString());
+					map1.put("UserData",vm);
+					map.put("status", "200");
+					map.put("message", "OK.");
+					map.put("data", map1);
+					return ok(Json.toJson(map));
+				}else{
+					c.setTwitterid(TwitterId);
+					c.setType("S");
+				}	
+			}
+			MultipartFormData body = request().body().asMultipartFormData();
+			if (body != null) {
+				FilePart filePart = body.getFile("image");
+				if (filePart != null) {
+					File f = filePart.getFile();
+					try {      
+						FileInputStream is = new FileInputStream(f);
+						File file = new File(Play.application().path().getAbsolutePath()+"/uploads/customers/"+filePart.getFilename());
+						int read = 0;
+						byte[] bytes = new byte[1024];
+						FileOutputStream os = new FileOutputStream(file);
+						while ((read = is.read(bytes)) != -1) {
+							os.write(bytes, 0, read);
+						}
+						os.close();
+						imageDataString = filePart.getFilename();
+						//FileInputStream imageInFile = new FileInputStream(f);
+						//byte imageData[] = new byte[(int) f.length()];
+						//imageInFile.read(imageData);
+						//imageInFile.close();
+						//imageDataString = Base64.encodeBase64URLSafeString(imageData);
+					} catch (FileNotFoundException e) {
+						System.out.println("Image not found" + e);
+					} catch (IOException ioe) {
+						System.out.println("Exception while reading the Image " + ioe);
+					}
+				}
+			} else if(imageUrl != null && !imageUrl.isEmpty()){
+				try {
+					URL url = new URL(imageUrl);
+					String fileName = url.getFile();
+					String destName = Play.application().path().getAbsolutePath()+"/uploads/customers/"+fileName.substring(fileName.lastIndexOf("/"));
+				 
+					InputStream is = url.openStream();
+					OutputStream os = new FileOutputStream(destName);
+				 
+					byte[] b = new byte[2048];
+					int length;
+				 
+					while ((length = is.read(b)) != -1) {
+							os.write(b, 0, length);
+					}
+					
+					is.close();
+					os.close();
+					imageDataString = fileName.substring(fileName.lastIndexOf("/"));
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
-		}
-		
-		if(fname.isEmpty() || fname == null ||
-				lname.isEmpty() || lname == null){
-			map.put("status", "500");
-			map.put("message", "Please fill required data.");
-			map.put("data", null);
-			return ok(Json.toJson(map));
-		}
-		if(pass != null){
-			if(!pass.equals(repass)){
+		} else {
+			if(fname == null || fname.isEmpty() ||
+					 lname == null || lname.isEmpty()){
 				map.put("status", "500");
-				map.put("message", "Passwords don't match.");
+				map.put("message", "Please fill required data.");
 				map.put("data", null);
 				return ok(Json.toJson(map));
 			}
-		}
-
-		c.setFirstname(fname  +" "+  lname);
-		//c.setLastname(lname);
-		c.setEmail(email);
-		c.setPassword(pass);
-		c.setAddress(address);
-		c.setContactNo(contactNo);
-		c.setImage(imageDataString);
-		c.setType("M");
-		c.setQCartMailingList(qcart.toString());
-		Date d = new Date();
-		c.setLastActive(d);
-		c.setCreatedDate(d);
-		c.setUpdatedDate(d);
-		if(FacebookId != null && !FacebookId.isEmpty()){
-			WdCustomer cc = WdCustomer.findByFbId(FacebookId);
-			if(cc != null){
-				CustomerVM vm = new CustomerVM();
-				vm.id = cc.getId();
-				vm.name = (cc.getFirstname());
-				//vm.lastName = c.getLastname();
-				vm.email = cc.getEmail();
-				vm.password = cc.getPassword();
-				vm.address = cc.getAddress();
-				vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + cc.getId();
-				vm.contactNo = cc.getContactNo();
-				vm.createdDate = cc.getCreatedDate();
-				vm.updatedDate = cc.getUpdatedDate();
-				vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
-				vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
-				
-				HashMap<String, Object> map1 = new HashMap<>();
-				map1.put("CTPYE", "S");
-				map1.put("CustomerID", cc.getId().toString());
-				map1.put("UserData",vm);
-				map.put("status", "200");
-				map.put("message", "OK.");
-				map.put("data", map1);
-				return ok(Json.toJson(map));
-			}else{
-				c.setFacebookid(FacebookId);
-				c.setType("S");
+			if(pass != null){
+				if(!pass.equals(repass)){
+					map.put("status", "500");
+					map.put("message", "Passwords don't match.");
+					map.put("data", null);
+					return ok(Json.toJson(map));
+				}
 			}
-
-		} else if(GooglePlusId != null && !GooglePlusId.isEmpty()){
-			WdCustomer cc = WdCustomer.findByGoogleID(GooglePlusId);
-			if(cc != null){
-				
-				CustomerVM vm = new CustomerVM();
-				vm.id = cc.getId();
-				vm.name = (cc.getFirstname());
-				//vm.lastName = c.getLastname();
-				vm.email = cc.getEmail();
-				vm.password = cc.getPassword();
-				vm.address = cc.getAddress();
-				vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + cc.getId();
-				vm.contactNo = cc.getContactNo();
-				vm.createdDate = cc.getCreatedDate();
-				vm.updatedDate = cc.getUpdatedDate();
-				vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
-				vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
-				
-				HashMap<String, Object> map1 = new HashMap<>();
-				map1.put("CTPYE", "S");
-				map1.put("CustomerID", cc.getId().toString());
-				map1.put("UserData",vm);
-				map.put("status", "200");
-				map.put("message", "OK.");
-				map.put("data", map1);
-				return ok(Json.toJson(map));
-			}else{
-				c.setGoogleplusid(GooglePlusId);
-				c.setType("S");
-			}
-		} else if(TwitterId != null && !TwitterId.isEmpty()){
-			WdCustomer cc = WdCustomer.findByTwitterId(TwitterId);
-			if(cc != null){
-				CustomerVM vm = new CustomerVM();
-				vm.id = cc.getId();
-				vm.name = (cc.getFirstname());
-				//vm.lastName = c.getLastname();
-				vm.email = cc.getEmail();
-				vm.password = cc.getPassword();
-				vm.address = cc.getAddress();
-				vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + cc.getId();
-				vm.contactNo = cc.getContactNo();
-				vm.createdDate = cc.getCreatedDate();
-				vm.updatedDate = cc.getUpdatedDate();
-				vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
-				vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
-				
-				HashMap<String, Object> map1 = new HashMap<>();
-				map1.put("CTPYE", "S");
-				map1.put("CustomerID", cc.getId().toString());
-				map1.put("UserData",vm);
-				map.put("status", "200");
-				map.put("message", "OK.");
-				map.put("data", map1);
-				return ok(Json.toJson(map));
-			}else{
-				c.setTwitterid(TwitterId);
-				c.setType("S");
-			}	
-		}
-		
-		if(c.getType().equals("M")){
 			WdCustomer cus = WdCustomer.findByEmail(email);
 			if(cus != null){
 				map.put("status", "500");
@@ -234,10 +274,27 @@ public class Application extends Controller {
 				map.put("data", null);
 				return ok(Json.toJson(map));
 			}
+			c.setType("M");
 		}
 		
-		c.save();
+		c.setFirstname(fname  +" "+  lname);
+		//c.setLastname(lname);
+		c.setEmail(email);
+		c.setPassword(pass);
+		c.setAddress(address);
+		c.setContactNo(contactNo);
+		c.setImage(imageDataString);
+		c.setQCartMailingList(qcart.toString());
+		Date d = new Date();
+		c.setLastActive(d);
+		c.setCreatedDate(d);
+		c.setUpdatedDate(d);
+		c.setQistSku("QCS");
 		
+		c.save();
+	
+		c.setSkuPostfix((int)(long)c.getId());
+		c.update();
 		
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
@@ -246,14 +303,12 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
+		vm.image = FILEPATH + "/customers" +c.getImage();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
-	
-		
 		
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("CTPYE", c.getType());
@@ -268,8 +323,6 @@ public class Application extends Controller {
 	public static Result login(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
-		final String BASE_URL_PATH = Play.application().configuration()
-				.getString("url");
 		
 		String email = data.path("email").asText();
 		String password = data.path("password").asText();
@@ -301,13 +354,15 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
+		vm.image = FILEPATH + "/customers" +c.getImage();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
 	
+		c.setLastActive(new Date());
+		c.update();
 		
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("CTPYE", c.getType());
@@ -323,7 +378,6 @@ public class Application extends Controller {
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		
-		
 		String email = data.path("email").asText();
 		WdCustomer c = WdCustomer.findByEmail(email);
 		if(c == null){
@@ -333,6 +387,8 @@ public class Application extends Controller {
 			return ok(Json.toJson(map));
 		}else{
 			sendPasswordMail(c.getEmail(),c.getPassword());
+			c.setUpdatedDate(new Date());
+			c.update();
 		}
 		map.put("status", "200");
 		map.put("message", "Email sent with new password.");
@@ -343,8 +399,6 @@ public class Application extends Controller {
 	public static Result getCustomerProfile(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
-		final String BASE_URL_PATH = Play.application().configuration()
-				.getString("url");
 		
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id);
@@ -361,7 +415,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
+		vm.image = FILEPATH + "/customers" +c.getImage();;
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -377,9 +431,6 @@ public class Application extends Controller {
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 	
-		final String BASE_URL_PATH = Play.application().configuration()
-				.getString("url");
-		
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
@@ -390,6 +441,7 @@ public class Application extends Controller {
 		}
 		c.setFirstname(data.path("name").asText());
 		//c.setLastname(data.path("lastName").asText());
+		c.setUpdatedDate(new Date());
 		c.update();
 		
 		CustomerVM vm = new CustomerVM();
@@ -399,13 +451,12 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
+		vm.image = FILEPATH + "/customers" +c.getImage();;
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
-		
 		
 		map.put("status", "200");
 		map.put("message", "OK.");
@@ -417,8 +468,6 @@ public class Application extends Controller {
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
-		final String BASE_URL_PATH = Play.application().configuration()
-				.getString("url");
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
 			map.put("status", "500");
@@ -427,6 +476,7 @@ public class Application extends Controller {
 			return ok(Json.toJson(map));
 		}
 		c.setPassword(data.path("password").asText());
+		c.setUpdatedDate(new Date());
 		c.update();
 		
 		CustomerVM vm = new CustomerVM();
@@ -436,7 +486,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
+		vm.image = FILEPATH + "/customers" +c.getImage();;
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -452,9 +502,6 @@ public class Application extends Controller {
 	public static Result changeCustomerAddress(){
 		HashMap<String, Object> map = new HashMap<>();
 		
-		final String BASE_URL_PATH = Play.application().configuration()
-				.getString("url");
-		
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
@@ -465,6 +512,7 @@ public class Application extends Controller {
 			return ok(Json.toJson(map));
 		}
 		c.setAddress(data.path("address").asText());
+		c.setUpdatedDate(new Date());
 		c.update();
 		
 		CustomerVM vm = new CustomerVM();
@@ -474,7 +522,7 @@ public class Application extends Controller {
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
 		vm.address = c.getAddress();
-		vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
+		vm.image = FILEPATH + "/customers" +c.getImage();;
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
@@ -546,11 +594,7 @@ public class Application extends Controller {
 			vm.id = p.getId();
 			vm.name = p.getName();
 			vm.description = p .getDescription();
-			vm.image = p.getImage();
-			vm.qrCode = p.getQrCode();
-			vm.specifications = p.getSpecifications();
 			vm.status = p .getStatus();
-			vm.createdTime = p.getCreatedTime();
 			vm.approvedDate = p.getApprovedDate();
 			vm.createdDate = p.getCreatedDate();
 			vm.updatedDate = p.getUpdatedDate();
@@ -558,6 +602,13 @@ public class Application extends Controller {
 			vm.mfrSku = p.getMfrSku();
 			vm.storeSku = p.getStoreSku();
 			vm.qistNo = p.getQistSku() + p.getSkuPostfix();
+			vm.qistPrice = p.getQistPrice();
+			vm.validFromDate = p.getValidFromDate();
+			vm.validToDate = p.getValidToDate();
+			for(WdProductImage i:p.getProductImages()){
+				String url = FILEPATH + "products\\" + i.getProductImageName();
+				vm.images.add(url);
+			}
 			plist.add(vm);
 		}
 		return plist;
@@ -664,18 +715,21 @@ public class Application extends Controller {
 				vm.id = p.getId();
 				vm.name = p.getName();
 				vm.description = p .getDescription();
-				vm.image = p.getImage();
-				vm.qrCode = p.getQrCode();
-				vm.specifications = p.getSpecifications();
 				vm.status = p .getStatus();
-				vm.createdTime = p.getCreatedTime();
 				vm.approvedDate = p.getApprovedDate();
 				vm.createdDate = p.getCreatedDate();
 				vm.updatedDate = p.getUpdatedDate();
 				vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
 				vm.mfrSku = p.getMfrSku();
 				vm.storeSku = p.getStoreSku();
-				vm.qistNo = p.getQistSku()+p.getSkuPostfix();
+				vm.qistNo = p.getQistSku() + p.getSkuPostfix();
+				vm.qistPrice = p.getQistPrice();
+				vm.validFromDate = p.getValidFromDate();
+				vm.validToDate = p.getValidToDate();
+				for(WdProductImage i:p.getProductImages()){
+					String url = FILEPATH + "products\\" + i.getProductImageName();
+					vm.images.add(url);
+				}
 				VMs.add(vm);
 			}
 		}
@@ -690,9 +744,9 @@ public class Application extends Controller {
 		JsonNode data = request().body().asJson();
 		Long userId = data.path("userId").asLong();
 		String qrcode = data.path("qrCode").asText();
-	
+
 		WdCustomer w = WdCustomer.findById(userId);
-		WdProduct p = WdProduct.findByQrCode(qrcode);
+		WdProduct p = WdProduct.findByQistSkuAndSkuPostfix(qrcode);
 		if(w == null){
 			map.put("status", "500");
 			map.put("message", "User does not exist.");
@@ -705,23 +759,21 @@ public class Application extends Controller {
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}
-	
+
 		List<WdProduct> prods = w.getWdProducts();
 		if(!prods.contains(p)){
 			prods.add(p);
 			w.setWdProducts(prods);
 			w.save();
 		}
-		
-		
+
 		Date today = new Date();
-		 
-		 SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-	     String date = DATE_FORMAT.format(today);
-	     System.out.println("Today in dd/MM/yyyy format : " + date);
-		
+		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+		String date = DATE_FORMAT.format(today);
+		System.out.println("Today in dd/MM/yyyy format : " + date);
+
 		CustomerSession cs = CustomerSession.getCustomerSessionByRetailerAndDate(p.getWdRetailer(),DATE_FORMAT.parse(date));
-		
+
 		if(cs == null){
 			cs = new CustomerSession();
 			cs.setWdRetailer(p.getWdRetailer());
@@ -729,30 +781,32 @@ public class Application extends Controller {
 			cs.setStart(DATE_FORMAT.parse(date));
 			cs.save();
 		}
-		
+
 		SessionProduct sp  = new  SessionProduct() ;
 		sp.setWdProduct(p);
 		sp.setPurchased(false);
 		sp.setCustomerSession(cs);
- 		sp.save();
- 
-		
+		sp.save();
+
 		ProductVM vm = new ProductVM();
 		vm.id = p.getId();
 		vm.name = p.getName();
 		vm.description = p .getDescription();
-		vm.image = p.getImage();
-		vm.qrCode = p.getQrCode();
-		vm.specifications = p.getSpecifications();
 		vm.status = p .getStatus();
-		vm.createdTime = p.getCreatedTime();
 		vm.approvedDate = p.getApprovedDate();
 		vm.createdDate = p.getCreatedDate();
 		vm.updatedDate = p.getUpdatedDate();
 		vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
 		vm.mfrSku = p.getMfrSku();
 		vm.storeSku = p.getStoreSku();
-		vm.qistNo = p.getQistSku()+p.getSkuPostfix();
+		vm.qistNo = p.getQistSku() + p.getSkuPostfix();
+		vm.qistPrice = p.getQistPrice();
+		vm.validFromDate = p.getValidFromDate();
+		vm.validToDate = p.getValidToDate();
+		for(WdProductImage i:p.getProductImages()){
+			String url = FILEPATH + "products\\" + i.getProductImageName();
+			vm.images.add(url);
+		}
 		map.put("status", "200");
 		map.put("message", "OK.");
 		map.put("data", vm);
@@ -774,10 +828,8 @@ public class Application extends Controller {
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}else{
-			
 			List<CustomerSession>  cs = CustomerSession.getCustomerSessionByCustomerId(w);
 			for(CustomerSession c :  cs){
-				
 				CustomerSessionVM customerSession = new CustomerSessionVM();
 				customerSession.id = c.getId();
 				
@@ -813,31 +865,33 @@ public class Application extends Controller {
                 rvm.setWorkPhone2(r.getWorkPhone2());
                 rvm.setWorkUrl(r.getWorkUrl());
                 rvm.setQistNo(r.getQistSku()+r.getSkuPostfix());
-                
+
                 customerSession.retailerVM = rvm;
 				customerSession.start = c.getStart();
 				
 				List<SessionProduct> products = SessionProduct.getSessionProductByCustomerId(c);
-				
 				for(SessionProduct s: products){
 					ProductVM pvm = new ProductVM();
 					pvm.id = s.getWdProduct().getId();
 					pvm.approvedDate = s.getWdProduct().getApprovedDate();
 					pvm.createdDate = s.getWdProduct().getCreatedDate();
-					pvm.createdTime = s.getWdProduct().getCreatedTime();
 					pvm.description = s.getWdProduct().getDescription();
-					pvm.image = s.getWdProduct().getImage();
 					pvm.isApproved =Boolean.parseBoolean(s.getWdProduct().getIsApproved());
 					pvm.mfrSku = s.getWdProduct().getMfrSku();
 					pvm.name = s.getWdProduct().getName();
 					pvm.qistNo = s.getWdProduct().getQistSku()+s.getWdProduct().getSkuPostfix();
-					pvm.qrCode = s.getWdProduct().getQrCode();
-					pvm.specifications = s.getWdProduct().getSpecifications();
 					pvm.status = s.getWdProduct().getStatus();
-					
+					pvm.updatedDate = s.getWdProduct().getUpdatedDate();
+					pvm.storeSku = s.getWdProduct().getStoreSku();
+					pvm.qistPrice = s.getWdProduct().getQistPrice();
+					pvm.validFromDate = s.getWdProduct().getValidFromDate();
+					pvm.validToDate = s.getWdProduct().getValidToDate();
+					for(WdProductImage i:s.getWdProduct().getProductImages()){
+						String url = FILEPATH + "products\\" + i.getProductImageName();
+						pvm.images.add(url);
+					}
 					customerSession.products.add(pvm);	
 				}
-				
 				customerSessionVMs.add(customerSession);
 			}	
 			map.put("status", "200");
@@ -845,7 +899,6 @@ public class Application extends Controller {
 			map.put("data", customerSessionVMs);
 			return ok(Json.toJson(map));
 		}
-		
 	} 
 	
 	public static void sendPasswordMail(String email,String pass) {
@@ -887,37 +940,42 @@ public class Application extends Controller {
 	public static Result  changeCustomerProfileImage() throws IOException{
 		HashMap<String, Object> map = new HashMap<>();
 		DynamicForm users = Form.form().bindFromRequest();
-		final String BASE_URL_PATH = Play.application().configuration()
-				.getString("url");		
-		long  id = Long.parseLong(users.get("userId"));
+
+		Long id = Long.parseLong(users.get("userId"));
 		WdCustomer c = WdCustomer.findById(id); 
 	
 		String imageDataString = new String();
 		if(c != null){
 			MultipartFormData body = request().body().asMultipartFormData();
-			
 			if (body != null) {
 				FilePart filePart = body.getFile("image");
 				if (filePart != null) {
 					File f = filePart.getFile();
-					System.out.println("imageee file===="+f);
-                
-					try {            
-						FileInputStream imageInFile = new FileInputStream(f);
-						byte imageData[] = new byte[(int) f.length()];
-						imageInFile.read(imageData);
-						imageInFile.close();
-						imageDataString = Base64.encodeBase64URLSafeString(imageData);
-						System.out.println("imageee===="+imageDataString);
+					try {         
+						FileInputStream is = new FileInputStream(f);
+						File file = new File(Play.application().path().getAbsolutePath()+"/uploads/customers/"+filePart.getFilename());
+						int read = 0;
+						byte[] bytes = new byte[1024];
+						FileOutputStream os = new FileOutputStream(file);
+						while ((read = is.read(bytes)) != -1) {
+							os.write(bytes, 0, read);
+						}
+						os.close();
+						imageDataString = filePart.getFilename();
+						//FileInputStream imageInFile = new FileInputStream(f);
+						//byte imageData[] = new byte[(int) f.length()];
+						//imageInFile.read(imageData);
+						//imageInFile.close();
+						//imageDataString = Base64.encodeBase64URLSafeString(imageData);
 					} catch (FileNotFoundException e) {
 						System.out.println("Image not found" + e);
 					} catch (IOException ioe) {
 						System.out.println("Exception while reading the Image " + ioe);
 					}
-
 				}
 			}
 			c.setImage(imageDataString);
+			c.setUpdatedDate(new Date());
 			c.update();
 			CustomerVM vm = new CustomerVM();
 			vm.id = c.getId();
@@ -926,7 +984,7 @@ public class Application extends Controller {
 			vm.email = c.getEmail();
 			vm.password = c.getPassword();
 			vm.address = c.getAddress();
-			vm.image = BASE_URL_PATH + "/getCustomerProfileImage/" + c.getId();
+			vm.image = FILEPATH + "/customers" +c.getImage();
 			vm.contactNo = c.getContactNo();
 			vm.createdDate = c.getCreatedDate();
 			vm.updatedDate = c.getUpdatedDate();
@@ -940,43 +998,35 @@ public class Application extends Controller {
 			map.put("status", "200");
 			map.put("message", "OK.");
 			map.put("data", map1);
-
 			return ok(Json.toJson(map));
 		}else{
-				map.put("status", "500");
-				map.put("message", "User does not exist.");
-				map.put("data", null);
-				return ok(Json.toJson(map));
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
 		}
 	}
 	
 	
 	public static Result getCustomerProfileImage(Long id) throws IOException{
 		WdCustomer c = WdCustomer.findById(id); 
-		
-		 String outFolderPath = Play.application().path().getAbsolutePath() +"/images";
-         File outFolder = new File(outFolderPath);
-
-         if (!outFolder.exists()) {
-                 outFolder.mkdir();
-         }
-         
-         File f = new File(outFolderPath+"/"+c.getFirstname() +".png");
-		  if( c !=  null){
-			  if(c.getImage() !=  null){
-				  byte[] encoded = Base64.decodeBase64(c.getImage());
-					FileOutputStream imageOutFile = new FileOutputStream(f);
-					imageOutFile.write(encoded);
-					imageOutFile.close();
-					FileInputStream fis = new FileInputStream(f);
-					return ok(fis).as(("picture/stream"));
-			  }else{
-				  return ok();
-			  }
-			
-		}else{
-			return ok();
+		String outFolderPath = Play.application().path().getAbsolutePath() +"/images";
+		File outFolder = new File(outFolderPath);
+		if (!outFolder.exists()) {
+			outFolder.mkdir();
 		}
+		File f = new File(outFolderPath+"/"+c.getFirstname() +".png");
+		if( c !=  null){
+			if(c.getImage() !=  null){
+				byte[] encoded = Base64.decodeBase64(c.getImage());
+				FileOutputStream imageOutFile = new FileOutputStream(f);
+				imageOutFile.write(encoded);
+				imageOutFile.close();
+				FileInputStream fis = new FileInputStream(f);
+				return ok(fis).as(("picture/stream"));
+			}
+		}
+		return ok();
 	}
 
 }

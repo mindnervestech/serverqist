@@ -43,10 +43,6 @@ public class WdProduct extends Model {
 	@Column(name="created_date")
 	private Date createdDate;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="created_time")
-	private Date createdTime;
-
 	private String description;
 
 	@Lob
@@ -62,15 +58,24 @@ public class WdProduct extends Model {
 
 	@Column(name="qist_sku")
 	private String qistSku;
+	
+	@Column(name="qist_price")
+	private Double qistPrice;
 
 	@Column(name="qr_code")
 	private String qrCode;
 
+	@Column(name="qr_message")
+	private String qrMessage;
+	
+	@Column(name="valid_from_date")
+	private Date validFromDate;
+	
+	@Column(name="valid_to_date")
+	private Date validToDate;
+	
 	@Column(name="sku_postfix")
 	private int skuPostfix;
-
-	@Lob
-	private String specifications;
 
 	private String status;
 
@@ -114,6 +119,9 @@ public class WdProduct extends Model {
 	
 	@OneToMany(mappedBy="wdProduct")
 	private List<SessionProduct> sessionProducts;
+	
+	@OneToMany(mappedBy="wdProduct")
+	private List<WdProductImage> productImages;
 
 	public WdProduct() {
 	}
@@ -140,14 +148,6 @@ public class WdProduct extends Model {
 
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
-	}
-
-	public Date getCreatedTime() {
-		return this.createdTime;
-	}
-
-	public void setCreatedTime(Date createdTime) {
-		this.createdTime = createdTime;
 	}
 
 	public String getDescription() {
@@ -224,14 +224,6 @@ public class WdProduct extends Model {
 		this.skuPostfix = skuPostfix;
 	}
 
-	public String getSpecifications() {
-		return this.specifications;
-	}
-
-	public void setSpecifications(String specifications) {
-		this.specifications = specifications;
-	}
-
 	public String getStatus() {
 		return this.status;
 	}
@@ -302,8 +294,49 @@ public class WdProduct extends Model {
 		return sessionProduct;
 	}
 	
-	
-	
+	public Double getQistPrice() {
+		return qistPrice;
+	}
+
+	public void setQistPrice(Double qistPrice) {
+		this.qistPrice = qistPrice;
+	}
+
+	public String getQrMessage() {
+		return qrMessage;
+	}
+
+	public void setQrMessage(String qrMessage) {
+		this.qrMessage = qrMessage;
+	}
+
+	public Date getValidFromDate() {
+		return validFromDate;
+	}
+
+	public void setValidFromDate(Date validFromDate) {
+		this.validFromDate = validFromDate;
+	}
+
+	public Date getValidToDate() {
+		return validToDate;
+	}
+
+	public void setValidToDate(Date validToDate) {
+		this.validToDate = validToDate;
+	}
+
+	public List<WdProductImage> getProductImages() {
+		return productImages;
+	}
+
+	public void setProductImages(List<WdProductImage> productImages) {
+		this.productImages = productImages;
+	}
+
+
+
+
 	public static Finder<Long, WdProduct> find = new Finder<>(Long.class, WdProduct.class);
 
 	public static WdProduct findByQrCode(String qrcode) {
@@ -312,6 +345,10 @@ public class WdProduct extends Model {
 	
 	public static List<WdProduct> findByRetailer(WdRetailer wdRetailer) {
 		return find.where().eq("wdRetailer", wdRetailer).findList();
+	}
+
+	public static WdProduct findByQistSkuAndSkuPostfix(String qrcode) {
+		return find.where().eq("concat(qist_sku,sku_postfix)", qrcode).findUnique();
 	}
 	
 	
