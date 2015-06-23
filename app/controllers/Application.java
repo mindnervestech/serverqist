@@ -42,7 +42,6 @@ import models.WdProduct;
 import models.WdProductImage;
 import models.WdRetailer;
 
-import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Document;
 
 import play.Play;
@@ -235,7 +234,11 @@ public class Application extends Controller {
 		c.setAddress(address);
 		c.setContactNo(contactNo);
 		c.setImage(imageDataString);
-		c.setQCartMailingList(qcart.toString());
+		if(qcart.toString().equals("true")){
+			c.setQCartMailingList("0");
+		} else {
+			c.setQCartMailingList("1");
+		}
 		Date d = new Date();
 		c.setLastActive(d);
 		c.setCreatedDate(d);
@@ -784,7 +787,6 @@ public class Application extends Controller {
 		Date today = new Date();
 		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 		String date = DATE_FORMAT.format(today);
-		System.out.println("Today in dd/MM/yyyy format : " + date);
 
 		CustomerSession cs = CustomerSession.getCustomerSessionByRetailerAndDate(p.getWdRetailer(),DATE_FORMAT.parse(date));
 
@@ -883,7 +885,7 @@ public class Application extends Controller {
                 customerSession.retailerVM = rvm;
 				customerSession.start = c.getStart();
 				
-				List<SessionProduct> products = SessionProduct.getSessionProductByCustomerId(c);
+				List<SessionProduct> products = SessionProduct.getSessionProductByCustomerIdAndPurchased(c);
 				for(SessionProduct s: products){
 					ProductVM pvm = new ProductVM();
 					pvm.id = s.getWdProduct().getId();

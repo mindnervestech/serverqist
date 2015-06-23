@@ -1,6 +1,5 @@
 package models;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -11,7 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
 
 @Entity
 public class SessionProduct extends Model{
@@ -73,7 +71,7 @@ public class SessionProduct extends Model{
 
 	public static Finder<Long, SessionProduct> find = new Finder<>(Long.class, SessionProduct.class);
 
-	public static List <SessionProduct>  getSessionProductByCustomerId(CustomerSession customerSession) {
+	public static List <SessionProduct>  getSessionProductByCustomerIdAndPurchased(CustomerSession customerSession) {
 		return find.where().eq("customerSession", customerSession).eq("purchased", true).findList();
 	
 	}

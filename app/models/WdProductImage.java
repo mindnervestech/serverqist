@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import play.db.ebean.Model;
 
 @Entity
-@Table(name="wd_product_image")
+@Table(name="wd_product_images")
 @NamedQuery(name="WdProductImage.findAll", query="SELECT w FROM WdProductImage w")
 public class WdProductImage extends Model {
 	

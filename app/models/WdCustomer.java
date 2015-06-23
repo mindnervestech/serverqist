@@ -180,20 +180,20 @@ public class WdCustomer extends Model {
 	}
 
 	public String getQCartMailingList() {
-		if(this.qCartMailingList.equals("0")){
+		/*if(this.qCartMailingList.equals("0")){
 			this.qCartMailingList = "true";
 		} else {
 			this.qCartMailingList = "false";
-		}
+		}*/
 		return this.qCartMailingList;
 	}
 
 	public void setQCartMailingList(String qCartMailingList) {
-		if(qCartMailingList.equals("true")){
+		/*if(qCartMailingList.equals("true")){
 			qCartMailingList = "0";
 		} else {
 			qCartMailingList = "1";
-		}
+		}*/
 		this.qCartMailingList = qCartMailingList;
 	}
 
