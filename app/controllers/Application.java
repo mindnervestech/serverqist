@@ -805,7 +805,7 @@ public class Application extends Controller {
 		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 		String date = DATE_FORMAT.format(today);
 
-		CustomerSession cs = CustomerSession.getCustomerSessionByRetailerAndDate(p.getWdRetailer(),DATE_FORMAT.parse(date));
+		CustomerSession cs = CustomerSession.getCustomerSessionByRetailerAndDateAndCustomer(p.getWdRetailer(),DATE_FORMAT.parse(date),w);
 
 		if(cs == null){
 			cs = new CustomerSession();
@@ -921,7 +921,7 @@ public class Application extends Controller {
                 rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
 
                 customerSession.retailerVM = rvm;
-				customerSession.start = c.getStart();
+				customerSession.start = df.format(c.getStart());
 				
 				List<SessionProduct> products = SessionProduct.getSessionProductByCustomerIdAndPurchased(c);
 				for(SessionProduct s: products){
