@@ -67,6 +67,7 @@ public class Application extends Controller {
 	private static final double dist = 5.0;
 	final static String FILEPATH = Play.application().configuration().getString("filePath");
 	final static String DOMAIN_URL = Play.application().configuration().getString("domainUrl");
+	final static String PRODUCT_IMAGE = Play.application().configuration().getString("productImage");
 	
 	public static Result index() {
 		return ok(index.render("Your new application is ready."));
@@ -119,7 +120,7 @@ public class Application extends Controller {
 					vm.createdDate = cc.getCreatedDate();
 					vm.updatedDate = cc.getUpdatedDate();
 					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
-					vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
+					vm.qistNo = cc.getQistSku()+String.format("%07d", cc.getSkuPostfix());
 					
 					cc.setLastActive(new Date());
 					cc.update();
@@ -151,7 +152,7 @@ public class Application extends Controller {
 					vm.createdDate = cc.getCreatedDate();
 					vm.updatedDate = cc.getUpdatedDate();
 					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
-					vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
+					vm.qistNo = cc.getQistSku()+String.format("%07d", cc.getSkuPostfix());
 					
 					cc.setLastActive(new Date());
 					cc.update();
@@ -183,7 +184,7 @@ public class Application extends Controller {
 					vm.createdDate = cc.getCreatedDate();
 					vm.updatedDate = cc.getUpdatedDate();
 					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
-					vm.qistNo = cc.getQistSku()+cc.getSkuPostfix();
+					vm.qistNo = cc.getQistSku()+String.format("%07d", cc.getSkuPostfix());
 					
 					cc.setLastActive(new Date());
 					cc.update();
@@ -325,7 +326,7 @@ public class Application extends Controller {
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
-		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("CTPYE", c.getType());
@@ -376,7 +377,7 @@ public class Application extends Controller {
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
-		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 	
 		c.setLastActive(new Date());
 		c.update();
@@ -437,7 +438,7 @@ public class Application extends Controller {
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
-		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		map.put("status", "200");
 		map.put("message", "OK.");
 		map.put("data", vm);
@@ -473,7 +474,7 @@ public class Application extends Controller {
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
-		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		
 		map.put("status", "200");
 		map.put("message", "OK.");
@@ -508,7 +509,7 @@ public class Application extends Controller {
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
-		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		
 		map.put("status", "200");
 		map.put("message", "OK.");
@@ -544,7 +545,7 @@ public class Application extends Controller {
 		vm.createdDate = c.getCreatedDate();
 		vm.updatedDate = c.getUpdatedDate();
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
-		vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		
 		map.put("status", "200");
 		map.put("message", "OK.");
@@ -588,7 +589,7 @@ public class Application extends Controller {
 				vm.setCity(w.getCity());
 				vm.setContactPerson(w.getContactPerson());
 				vm.setWorkEmail(w.getWorkEmail());
-				vm.setQistNo(w.getQistSku()+w.getSkuPostfix());
+				vm.setQistNo(w.getQistSku()+String.format("%07d", w.getSkuPostfix()));
 				vmList.add(vm);
 			}
 		}
@@ -618,12 +619,12 @@ public class Application extends Controller {
 			vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
 			vm.mfrSku = p.getMfrSku();
 			vm.storeSku = p.getStoreSku();
-			vm.qistNo = p.getQistSku() + p.getSkuPostfix();
+			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 			vm.qistPrice = p.getQistPrice();
 			vm.validFromDate = p.getValidFromDate();
 			vm.validToDate = p.getValidToDate();
 			for(WdProductImage i:p.getProductImages()){
-				String url = FILEPATH + "products\\" + i.getProductImageName();
+				String url = PRODUCT_IMAGE + i.getProductImageName();
 				vm.images.add(url);
 			}
 			plist.add(vm);
@@ -651,7 +652,7 @@ public class Application extends Controller {
 		vm.setCity(w.getCity());
 		vm.setContactPerson(w.getContactPerson());
 		vm.setWorkEmail(w.getWorkEmail());
-		vm.setQistNo(w.getQistSku()+w.getSkuPostfix());
+		vm.setQistNo(w.getQistSku()+String.format("%07d", w.getSkuPostfix()));
 		List<ProductVM> prods = getProducts(id);
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("retailer", vm);
@@ -739,12 +740,12 @@ public class Application extends Controller {
 				vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
 				vm.mfrSku = p.getMfrSku();
 				vm.storeSku = p.getStoreSku();
-				vm.qistNo = p.getQistSku() + p.getSkuPostfix();
+				vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 				vm.qistPrice = p.getQistPrice();
 				vm.validFromDate = p.getValidFromDate();
 				vm.validToDate = p.getValidToDate();
 				for(WdProductImage i:p.getProductImages()){
-					String url = FILEPATH + "products\\" + i.getProductImageName();
+					String url = PRODUCT_IMAGE + i.getProductImageName();
 					vm.images.add(url);
 				}
 				VMs.add(vm);
@@ -815,12 +816,12 @@ public class Application extends Controller {
 		vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
 		vm.mfrSku = p.getMfrSku();
 		vm.storeSku = p.getStoreSku();
-		vm.qistNo = p.getQistSku() + p.getSkuPostfix();
+		vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 		vm.qistPrice = p.getQistPrice();
 		vm.validFromDate = p.getValidFromDate();
 		vm.validToDate = p.getValidToDate();
 		for(WdProductImage i:p.getProductImages()){
-			String url = FILEPATH + "products\\" + i.getProductImageName();
+			String url = PRODUCT_IMAGE + i.getProductImageName();
 			vm.images.add(url);
 		}
 		map.put("status", "200");
@@ -880,7 +881,7 @@ public class Application extends Controller {
                 rvm.setWorkPhone1(r.getWorkPhone1());
                 rvm.setWorkPhone2(r.getWorkPhone2());
                 rvm.setWorkUrl(r.getWorkUrl());
-                rvm.setQistNo(r.getQistSku()+r.getSkuPostfix());
+                rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
 
                 customerSession.retailerVM = rvm;
 				customerSession.start = c.getStart();
@@ -895,7 +896,7 @@ public class Application extends Controller {
 					pvm.isApproved =Boolean.parseBoolean(s.getWdProduct().getIsApproved());
 					pvm.mfrSku = s.getWdProduct().getMfrSku();
 					pvm.name = s.getWdProduct().getName();
-					pvm.qistNo = s.getWdProduct().getQistSku()+s.getWdProduct().getSkuPostfix();
+					pvm.qistNo = s.getWdProduct().getQistSku()+String.format("%07d", s.getWdProduct().getSkuPostfix());
 					pvm.status = s.getWdProduct().getStatus();
 					pvm.updatedDate = s.getWdProduct().getUpdatedDate();
 					pvm.storeSku = s.getWdProduct().getStoreSku();
@@ -903,7 +904,7 @@ public class Application extends Controller {
 					pvm.validFromDate = s.getWdProduct().getValidFromDate();
 					pvm.validToDate = s.getWdProduct().getValidToDate();
 					for(WdProductImage i:s.getWdProduct().getProductImages()){
-						String url = FILEPATH + "products\\" + i.getProductImageName();
+						String url = PRODUCT_IMAGE + i.getProductImageName();
 						pvm.images.add(url);
 					}
 					customerSession.products.add(pvm);	
@@ -1009,7 +1010,7 @@ public class Application extends Controller {
 			vm.createdDate = c.getCreatedDate();
 			vm.updatedDate = c.getUpdatedDate();
 			vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
-			vm.qistNo = c.getQistSku()+c.getSkuPostfix();
+			vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 			
 			HashMap<String, Object> map1 = new HashMap<>();
 			map1.put("CTPYE", c.getType());
