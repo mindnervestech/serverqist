@@ -1,6 +1,5 @@
 package viewmodels;
 
-import java.util.Date;
 
 public class CustomerVM {
 
@@ -18,10 +17,10 @@ public class CustomerVM {
 	public String TwitterId;
 	public boolean qCartMailingList;
 	public String qistNo;
-	public Date lastActive;
+	public String lastActive;
 	public String type;
-	public Date createdDate;
-	public Date updatedDate;
+	public String createdDate;
+	public String updatedDate;
 	
 	public String name;
 	

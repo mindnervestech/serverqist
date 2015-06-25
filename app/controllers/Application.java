@@ -10,12 +10,14 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.BodyPart;
@@ -68,6 +70,7 @@ public class Application extends Controller {
 	final static String FILEPATH = Play.application().configuration().getString("filePath");
 	final static String DOMAIN_URL = Play.application().configuration().getString("domainUrl");
 	final static String PRODUCT_IMAGE = Play.application().configuration().getString("productImage");
+	final static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 	
 	public static Result index() {
 		return ok(index.render("Your new application is ready."));
@@ -117,8 +120,9 @@ public class Application extends Controller {
 					vm.address = cc.getAddress();
 					vm.image = DOMAIN_URL+"getCustomerProfileImage/"+cc.getId();
 					vm.contactNo = cc.getContactNo();
-					vm.createdDate = cc.getCreatedDate();
-					vm.updatedDate = cc.getUpdatedDate();
+					vm.createdDate = df.format(cc.getCreatedDate());
+					vm.updatedDate = df.format(cc.getUpdatedDate());
+					vm.lastActive = df.format(cc.getLastActive());
 					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
 					vm.qistNo = cc.getQistSku()+String.format("%07d", cc.getSkuPostfix());
 					
@@ -149,8 +153,9 @@ public class Application extends Controller {
 					vm.address = cc.getAddress();
 					vm.image = DOMAIN_URL+"getCustomerProfileImage/"+cc.getId();
 					vm.contactNo = cc.getContactNo();
-					vm.createdDate = cc.getCreatedDate();
-					vm.updatedDate = cc.getUpdatedDate();
+					vm.createdDate = df.format(cc.getCreatedDate());
+					vm.updatedDate = df.format(cc.getUpdatedDate());
+					vm.lastActive = df.format(cc.getLastActive());
 					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
 					vm.qistNo = cc.getQistSku()+String.format("%07d", cc.getSkuPostfix());
 					
@@ -181,8 +186,9 @@ public class Application extends Controller {
 					vm.address = cc.getAddress();
 					vm.image = DOMAIN_URL+"getCustomerProfileImage/"+cc.getId();
 					vm.contactNo = cc.getContactNo();
-					vm.createdDate = cc.getCreatedDate();
-					vm.updatedDate = cc.getUpdatedDate();
+					vm.createdDate = df.format(cc.getCreatedDate());
+					vm.updatedDate = df.format(cc.getUpdatedDate());
+					vm.lastActive = df.format(cc.getLastActive());
 					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
 					vm.qistNo = cc.getQistSku()+String.format("%07d", cc.getSkuPostfix());
 					
@@ -323,8 +329,9 @@ public class Application extends Controller {
 		vm.address = c.getAddress();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
-		vm.createdDate = c.getCreatedDate();
-		vm.updatedDate = c.getUpdatedDate();
+		vm.createdDate = df.format(c.getCreatedDate());
+		vm.updatedDate = df.format(c.getUpdatedDate());
+		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		
@@ -374,8 +381,9 @@ public class Application extends Controller {
 		vm.address = c.getAddress();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
-		vm.createdDate = c.getCreatedDate();
-		vm.updatedDate = c.getUpdatedDate();
+		vm.createdDate = df.format(c.getCreatedDate());
+		vm.updatedDate = df.format(c.getUpdatedDate());
+		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 	
@@ -435,8 +443,9 @@ public class Application extends Controller {
 		vm.address = c.getAddress();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
-		vm.createdDate = c.getCreatedDate();
-		vm.updatedDate = c.getUpdatedDate();
+		vm.createdDate = df.format(c.getCreatedDate());
+		vm.updatedDate = df.format(c.getUpdatedDate());
+		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		map.put("status", "200");
@@ -471,8 +480,9 @@ public class Application extends Controller {
 		vm.address = c.getAddress();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
-		vm.createdDate = c.getCreatedDate();
-		vm.updatedDate = c.getUpdatedDate();
+		vm.createdDate = df.format(c.getCreatedDate());
+		vm.updatedDate = df.format(c.getUpdatedDate());
+		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		
@@ -506,8 +516,9 @@ public class Application extends Controller {
 		vm.address = c.getAddress();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
-		vm.createdDate = c.getCreatedDate();
-		vm.updatedDate = c.getUpdatedDate();
+		vm.createdDate = df.format(c.getCreatedDate());
+		vm.updatedDate = df.format(c.getUpdatedDate());
+		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		
@@ -542,8 +553,9 @@ public class Application extends Controller {
 		vm.address = c.getAddress();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
-		vm.createdDate = c.getCreatedDate();
-		vm.updatedDate = c.getUpdatedDate();
+		vm.createdDate = df.format(c.getCreatedDate());
+		vm.updatedDate = df.format(c.getUpdatedDate());
+		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		
@@ -613,16 +625,18 @@ public class Application extends Controller {
 			vm.name = p.getName();
 			vm.description = p .getDescription();
 			vm.status = p .getStatus();
-			vm.approvedDate = p.getApprovedDate();
-			vm.createdDate = p.getCreatedDate();
-			vm.updatedDate = p.getUpdatedDate();
 			vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
 			vm.mfrSku = p.getMfrSku();
 			vm.storeSku = p.getStoreSku();
 			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 			vm.qistPrice = p.getQistPrice();
-			vm.validFromDate = p.getValidFromDate();
-			vm.validToDate = p.getValidToDate();
+			if(p.getApprovedDate() != null){
+				vm.approvedDate = df.format(p.getApprovedDate());
+			}
+			vm.createdDate = df.format(p.getCreatedDate());
+			vm.updatedDate = df.format(p.getUpdatedDate());
+			vm.validFromDate = df.format(p.getValidFromDate());
+			vm.validToDate = df.format(p.getValidToDate());
 			for(WdProductImage i:p.getProductImages()){
 				String url = PRODUCT_IMAGE + i.getProductImageName();
 				vm.images.add(url);
@@ -734,16 +748,18 @@ public class Application extends Controller {
 				vm.name = p.getName();
 				vm.description = p .getDescription();
 				vm.status = p .getStatus();
-				vm.approvedDate = p.getApprovedDate();
-				vm.createdDate = p.getCreatedDate();
-				vm.updatedDate = p.getUpdatedDate();
 				vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
 				vm.mfrSku = p.getMfrSku();
 				vm.storeSku = p.getStoreSku();
 				vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 				vm.qistPrice = p.getQistPrice();
-				vm.validFromDate = p.getValidFromDate();
-				vm.validToDate = p.getValidToDate();
+				if(p.getApprovedDate() != null){
+					vm.approvedDate = df.format(p.getApprovedDate());
+				}
+				vm.createdDate = df.format(p.getCreatedDate());
+				vm.updatedDate = df.format(p.getUpdatedDate());
+				vm.validFromDate = df.format(p.getValidFromDate());
+				vm.validToDate = df.format(p.getValidToDate());
 				for(WdProductImage i:p.getProductImages()){
 					String url = PRODUCT_IMAGE + i.getProductImageName();
 					vm.images.add(url);
@@ -804,29 +820,50 @@ public class Application extends Controller {
 		sp.setPurchased(false);
 		sp.setCustomerSession(cs);
 		sp.save();
+		
+		Map<String, Object> res = new HashMap<>();
 
 		ProductVM vm = new ProductVM();
 		vm.id = p.getId();
 		vm.name = p.getName();
 		vm.description = p .getDescription();
 		vm.status = p .getStatus();
-		vm.approvedDate = p.getApprovedDate();
-		vm.createdDate = p.getCreatedDate();
-		vm.updatedDate = p.getUpdatedDate();
 		vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
 		vm.mfrSku = p.getMfrSku();
 		vm.storeSku = p.getStoreSku();
 		vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 		vm.qistPrice = p.getQistPrice();
-		vm.validFromDate = p.getValidFromDate();
-		vm.validToDate = p.getValidToDate();
+		if(p.getApprovedDate() != null){
+			vm.approvedDate = df.format(p.getApprovedDate());
+		}
+		vm.createdDate = df.format(p.getCreatedDate());
+		vm.updatedDate = df.format(p.getUpdatedDate());
+		vm.validFromDate = df.format(p.getValidFromDate());
+		vm.validToDate = df.format(p.getValidToDate());
 		for(WdProductImage i:p.getProductImages()){
 			String url = PRODUCT_IMAGE + i.getProductImageName();
 			vm.images.add(url);
 		}
+		
+		res.put("product", vm);
+		
+		WdRetailer r = p.getWdRetailer();
+		RetailerVM rvm = new RetailerVM();
+		rvm.setBusinessName(r.getBusinessName());
+		rvm.setStreetName(r.getStreetName());
+		rvm.setStreetNo(r.getStreetNo());
+		rvm.setSuburb(r.getSuburb());
+		rvm.setTradingName(r.getTradingName());
+		rvm.setCity(r.getCity());
+		rvm.setContactPerson(r.getContactPerson());
+		rvm.setWorkEmail(r.getWorkEmail());
+		rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
+
+		res.put("store", rvm);
+		
 		map.put("status", "200");
 		map.put("message", "OK.");
-		map.put("data", vm);
+		map.put("data", res);
 		return ok(Json.toJson(map));
 	}
 
@@ -890,19 +927,21 @@ public class Application extends Controller {
 				for(SessionProduct s: products){
 					ProductVM pvm = new ProductVM();
 					pvm.id = s.getWdProduct().getId();
-					pvm.approvedDate = s.getWdProduct().getApprovedDate();
-					pvm.createdDate = s.getWdProduct().getCreatedDate();
 					pvm.description = s.getWdProduct().getDescription();
 					pvm.isApproved =Boolean.parseBoolean(s.getWdProduct().getIsApproved());
 					pvm.mfrSku = s.getWdProduct().getMfrSku();
 					pvm.name = s.getWdProduct().getName();
 					pvm.qistNo = s.getWdProduct().getQistSku()+String.format("%07d", s.getWdProduct().getSkuPostfix());
 					pvm.status = s.getWdProduct().getStatus();
-					pvm.updatedDate = s.getWdProduct().getUpdatedDate();
 					pvm.storeSku = s.getWdProduct().getStoreSku();
 					pvm.qistPrice = s.getWdProduct().getQistPrice();
-					pvm.validFromDate = s.getWdProduct().getValidFromDate();
-					pvm.validToDate = s.getWdProduct().getValidToDate();
+					if(s.getWdProduct().getApprovedDate() != null){
+						pvm.approvedDate = df.format(s.getWdProduct().getApprovedDate());
+					}
+					pvm.createdDate = df.format(s.getWdProduct().getCreatedDate());
+					pvm.updatedDate = df.format(s.getWdProduct().getUpdatedDate());
+					pvm.validFromDate = df.format(s.getWdProduct().getValidFromDate());
+					pvm.validToDate = df.format(s.getWdProduct().getValidToDate());
 					for(WdProductImage i:s.getWdProduct().getProductImages()){
 						String url = PRODUCT_IMAGE + i.getProductImageName();
 						pvm.images.add(url);
@@ -1007,8 +1046,9 @@ public class Application extends Controller {
 			vm.address = c.getAddress();
 			vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 			vm.contactNo = c.getContactNo();
-			vm.createdDate = c.getCreatedDate();
-			vm.updatedDate = c.getUpdatedDate();
+			vm.createdDate = df.format(c.getCreatedDate());
+			vm.updatedDate = df.format(c.getUpdatedDate());
+			vm.lastActive = df.format(c.getLastActive());
 			vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 			vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 			
