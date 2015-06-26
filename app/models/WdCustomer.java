@@ -73,10 +73,6 @@ public class WdCustomer extends Model {
 	@Column(name="updated_date")
 	private Date updatedDate;
 
-	//bi-directional many-to-many association to WdProduct
-	@ManyToMany(mappedBy="wdCustomers")
-	private List<WdProduct> wdProducts;
-
 	@Lob
 	private String image;
 	
@@ -229,14 +225,6 @@ public class WdCustomer extends Model {
 		this.updatedDate = updatedDate;
 	}
 
-	public List<WdProduct> getWdProducts() {
-		return this.wdProducts;
-	}
-
-	public void setWdProducts(List<WdProduct> wdProducts) {
-		this.wdProducts = wdProducts;
-	}
-	
 	public List<Campaign> getCampaigns() {
 		return this.campaigns;
 	}

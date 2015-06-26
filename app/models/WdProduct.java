@@ -86,19 +86,6 @@ public class WdProduct extends Model {
 	@Column(name="updated_date")
 	private Date updatedDate;
 
-	//bi-directional many-to-many association to WdCustomer
-	@ManyToMany
-	@JoinTable(
-		name="wd_customer_product"
-		, joinColumns={
-			@JoinColumn(name="product_id")
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="customer_id")
-			}
-		)
-	private List<WdCustomer> wdCustomers;
-
 	//bi-directional many-to-one association to WdRetailer
 	@ManyToOne
 	@JoinColumn(name="retailer_id")
@@ -246,14 +233,6 @@ public class WdProduct extends Model {
 
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
-	}
-
-	public List<WdCustomer> getWdCustomers() {
-		return this.wdCustomers;
-	}
-
-	public void setWdCustomers(List<WdCustomer> wdCustomers) {
-		this.wdCustomers = wdCustomers;
 	}
 
 	public WdRetailer getWdRetailer() {
