@@ -112,4 +112,9 @@ public class CustomerSession extends Model{
    {
 	   return find.where().eq("wdCustomer", wdCustomer).eq("end",null).findUnique();
    }
+   
+   public static  List<CustomerSession> getCustomerSessionByAllActiveCustomer()
+   {
+	   return find.where().eq("end",null).findList();
+   }
 }

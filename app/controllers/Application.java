@@ -70,6 +70,7 @@ public class Application extends Controller {
 	final static String FILEPATH = Play.application().configuration().getString("filePath");
 	final static String DOMAIN_URL = Play.application().configuration().getString("domainUrl");
 	final static String PRODUCT_IMAGE = Play.application().configuration().getString("productImage");
+	final static String RETAILER_IMAGE =Play.application().configuration().getString("retailerImage");
 	final static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 	
 	public static Result index() {
@@ -597,6 +598,7 @@ public class Application extends Controller {
 				vm.setStreetName(w.getStreetName());
 				vm.setStreetNo(w.getStreetNo());
 				vm.setSuburb(w.getSuburb());
+				vm.setLogoImage(RETAILER_IMAGE + w.getLogoImage());
 				vm.setTradingName(w.getTradingName());
 				vm.setCity(w.getCity());
 				vm.setContactPerson(w.getContactPerson());
@@ -664,6 +666,7 @@ public class Application extends Controller {
 		vm.setSuburb(w.getSuburb());
 		vm.setTradingName(w.getTradingName());
 		vm.setCity(w.getCity());
+		vm.setLogoImage(RETAILER_IMAGE + w.getLogoImage());
 		vm.setContactPerson(w.getContactPerson());
 		vm.setWorkEmail(w.getWorkEmail());
 		vm.setQistNo(w.getQistSku()+String.format("%07d", w.getSkuPostfix()));
@@ -779,6 +782,7 @@ public class Application extends Controller {
 				rvm.setStreetName(r.getStreetName());
 				rvm.setStreetNo(r.getStreetNo());
 				rvm.setSuburb(r.getSuburb());
+				rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
 				rvm.setTradingName(r.getTradingName());
 				rvm.setCity(r.getCity());
 				rvm.setContactPerson(r.getContactPerson());
@@ -897,6 +901,7 @@ public class Application extends Controller {
 		rvm.setBusinessName(r.getBusinessName());
 		rvm.setStreetName(r.getStreetName());
 		rvm.setStreetNo(r.getStreetNo());
+		rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
 		rvm.setSuburb(r.getSuburb());
 		rvm.setTradingName(r.getTradingName());
 		rvm.setCity(r.getCity());
@@ -945,7 +950,7 @@ public class Application extends Controller {
                 rvm.setGoogleLink(r.getGoogleLink());
                 rvm.setGstNo(r.getGstNo());
                 rvm.setIrNo(r.getIrNo());
-                rvm.setLogoImage(r.getLogoImage());
+                rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
                 rvm.setMerchantId(r.getMerchantId());
                 rvm.setMobileNo(r.getMobileNo());
                 rvm.setPaymark(r.getPaymark());
@@ -1033,7 +1038,7 @@ public class Application extends Controller {
                 rvm.setGoogleLink(r.getGoogleLink());
                 rvm.setGstNo(r.getGstNo());
                 rvm.setIrNo(r.getIrNo());
-                rvm.setLogoImage(r.getLogoImage());
+                rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
                 rvm.setMerchantId(r.getMerchantId());
                 rvm.setMobileNo(r.getMobileNo());
                 rvm.setPaymark(r.getPaymark());
