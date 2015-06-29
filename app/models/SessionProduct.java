@@ -8,10 +8,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 
 import play.db.ebean.Model;
 
 @Entity
+@Table(name="wd_session_products")
+@NamedQuery(name="SessionProduct.findAll", query="SELECT w FROM SessionProduct w")
 public class SessionProduct extends Model{
 
 	@Id

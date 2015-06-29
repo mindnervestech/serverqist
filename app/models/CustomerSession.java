@@ -9,11 +9,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import play.db.ebean.Model;
 
 @Entity
+@Table(name="wd_customer_sessions")
+@NamedQuery(name="CustomerSession.findAll", query="SELECT w FROM CustomerSession w")
 public class CustomerSession extends Model{
 	
 	@Id
