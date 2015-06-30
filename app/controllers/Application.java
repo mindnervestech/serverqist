@@ -1,11 +1,13 @@
 package controllers;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -44,6 +46,7 @@ import models.WdCustomer;
 import models.WdProduct;
 import models.WdProductImage;
 import models.WdRetailer;
+
 
 import org.w3c.dom.Document;
 
@@ -609,10 +612,32 @@ public class Application extends Controller {
 				vmList.add(vm);
 			}
 		}
+		String URL = "http://maps.googleapis.com/maps/api/geocode/json";
+		URL url = new URL(URL + "?latlng="
+				+ lat+","+lon + "&sensor=true");
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+		String output = "",full="";
+		output = br.readLine();
+		while (output != null) {
+
+			if(output.indexOf("formatted_address")>-1){
+				System.out.println(output);
+
+				full=output.substring(32);
+				if(full.indexOf(",")>-1)
+				{
+					full=full.substring(0,full.lastIndexOf(',')-1);
+				}
+				break;
+			}
+			output = br.readLine();  
+		}
 		List<ProductVM> prods = getProducts(currentId);
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("products", prods);
 		map1.put("retailers", vmList);
+		map1.put("location",full);
 		map.put("status", "200");
 		map.put("message", "OK.");
 		map.put("data", map1);
