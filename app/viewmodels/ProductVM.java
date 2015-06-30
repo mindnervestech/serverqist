@@ -20,6 +20,7 @@ public class ProductVM {
 	public String storeSku;
 	public String updatedDate;
 	public String qistNo;
+	public List<String> categories = new ArrayList<>();
 	public List<String> images = new ArrayList<>();
 	
 }

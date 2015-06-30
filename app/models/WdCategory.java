@@ -15,6 +15,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import play.db.ebean.Model;
+import play.db.ebean.Model.Finder;
+import scala.collection.parallel.ParIterableLike.Find;
 
 
 /**
@@ -106,6 +108,14 @@ public class WdCategory extends Model {
 
 	public void setWdProducts(List<WdProduct> wdProducts) {
 		this.wdProducts = wdProducts;
+	} 
+	
+	public static Finder<Long, WdCategory> find = new Finder<>(Long.class, WdCategory.class);
+	
+	public static List<WdCategory> getByMainParent()
+	{
+		return find.where().eq("parentId",0L).findList();
 	}
+	
 
 }

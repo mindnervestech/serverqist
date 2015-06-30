@@ -330,6 +330,10 @@ public class WdProduct extends Model {
 		return find.where().eq("concat(qist_sku,sku_postfix)", qrcode).findUnique();
 	}
 	
+	public static WdProduct findByProductId(Long Id){
+		return find.byId(Id);
+	}
+	
 	
 
 }
