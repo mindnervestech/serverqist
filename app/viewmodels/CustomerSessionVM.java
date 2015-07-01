@@ -8,5 +8,6 @@ public class CustomerSessionVM {
 	public RetailerVM retailerVM;
 	public List<ProductVM> products = new  ArrayList<>();
     public String start;
+    public String end;
     
 }

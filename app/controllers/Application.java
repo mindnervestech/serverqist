@@ -47,7 +47,6 @@ import models.WdProduct;
 import models.WdProductImage;
 import models.WdRetailer;
 
-
 import org.w3c.dom.Document;
 
 import play.Play;
@@ -77,6 +76,7 @@ public class Application extends Controller {
 	final static String PRODUCT_IMAGE = Play.application().configuration().getString("productImage");
 	final static String RETAILER_IMAGE =Play.application().configuration().getString("retailerImage");
 	final static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	final static DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	
 	public static Result index() {
 		return ok(index.render("Your new application is ready."));
@@ -575,7 +575,7 @@ public class Application extends Controller {
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		String lat = data.path("lat").asText();
-		String lon = data.path("long").asText();
+		String lon = data.path("lng").asText();
 		double lon1 = Double.parseDouble(lon);
 		double latn1 = Double.parseDouble(lat);
 		long currentId = 0;
@@ -960,6 +960,16 @@ public class Application extends Controller {
 		if(cs1 != null)
 		{
 			if(cs1.getWdRetailer().getId() == p.getWdRetailer().getId()){
+				for(SessionProduct sp1 : cs1.getSessionProducts())
+        		{
+        			if(sp1.getWdProduct().getId()==p.getId())
+        			{
+        				map.put("status", "500");
+        				map.put("message", "Already added in cart.");
+        				map.put("data", null);
+        				return ok(Json.toJson(map));
+        			}
+        		}
 				SessionProduct sp  = new  SessionProduct() ;
 				sp.setWdProduct(p);
 				sp.setPurchased(false);
@@ -1057,6 +1067,9 @@ public class Application extends Controller {
 
 		WdCustomer w = WdCustomer.findById(userId);
 		WdProduct p = WdProduct.findByQistSkuAndSkuPostfix(qrcode);
+
+		Map<String, Object> res = new HashMap<>();
+
 		if(w == null){
 			if(p == null){
 				map.put("status", "500");
@@ -1085,9 +1098,26 @@ public class Application extends Controller {
 				String url = PRODUCT_IMAGE + i.getProductImageName();
 				vm.images.add(url);
 			}
+			
+			res.put("product", vm);
+			
+			WdRetailer r = p.getWdRetailer();
+			RetailerVM rvm = new RetailerVM();
+			rvm.setBusinessName(r.getBusinessName());
+			rvm.setStreetName(r.getStreetName());
+			rvm.setStreetNo(r.getStreetNo());
+			rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
+			rvm.setSuburb(r.getSuburb());
+			rvm.setTradingName(r.getTradingName());
+			rvm.setCity(r.getCity());
+			rvm.setContactPerson(r.getContactPerson());
+			rvm.setWorkEmail(r.getWorkEmail());
+			rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
+
+			res.put("store", rvm);
 			map.put("status", "200");
 			map.put("message", "OK.");
-			map.put("data", vm);
+			map.put("data", res);
 			return ok(Json.toJson(map));
 		}
 		if(p == null){
@@ -1106,6 +1136,16 @@ public class Application extends Controller {
         if(cs1 != null)
         {
         	if(cs1.getWdRetailer().getId() == p.getWdRetailer().getId()){
+        		for(SessionProduct sp1 : cs1.getSessionProducts())
+        		{
+        			if(sp1.getWdProduct().getId()==p.getId())
+        			{
+        				map.put("status", "500");
+        				map.put("message", "Already added in cart.");
+        				map.put("data", null);
+        				return ok(Json.toJson(map));
+        			}
+        		}
         		SessionProduct sp  = new  SessionProduct() ;
         		sp.setWdProduct(p);
         		sp.setPurchased(false);
@@ -1148,8 +1188,6 @@ public class Application extends Controller {
         	
         }
         
-		Map<String, Object> res = new HashMap<>();
-
 		ProductVM vm = new ProductVM();
 		vm.id = p.getId();
 		vm.name = p.getName();
@@ -1248,7 +1286,8 @@ public class Application extends Controller {
                 rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
 
                 customerSession.retailerVM = rvm;
-				customerSession.start = df.format(c.getStart());
+				customerSession.start = df1.format(c.getStart());
+				customerSession.end = df1.format(c.getEnd());
 				
 				List<SessionProduct> products = c.getSessionProducts();
 				for(SessionProduct s: products){
@@ -1336,7 +1375,8 @@ public class Application extends Controller {
                 rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
 
                 customerSession.retailerVM = rvm;
-				customerSession.start = df.format(c.getStart());
+				customerSession.start = df1.format(c.getStart());
+				customerSession.end = df1.format(c.getEnd());
 				
 				List<SessionProduct> products = c.getSessionProducts();
 				for(SessionProduct s: products){
