@@ -599,6 +599,7 @@ public class Application extends Controller {
 					}
 				}
 				RetailerVM vm = new RetailerVM();
+				vm.setId(w.getId());
 				vm.setBusinessName(w.getBusinessName());
 				vm.setStreetName(w.getStreetName());
 				vm.setStreetNo(w.getStreetNo());
@@ -687,6 +688,7 @@ public class Application extends Controller {
 			return ok(Json.toJson(map));
 		}
 		RetailerVM vm = new RetailerVM();
+		vm.setId(w.getId());
 		vm.setBusinessName(w.getBusinessName());
 		vm.setStreetName(w.getStreetName());
 		vm.setStreetNo(w.getStreetNo());
@@ -808,6 +810,7 @@ public class Application extends Controller {
 				map1.put("products",VMs);
 				WdRetailer r = cs1.getWdRetailer();
 				RetailerVM rvm = new RetailerVM();
+				rvm.setId(r.getId());
 				rvm.setBusinessName(r.getBusinessName());
 				rvm.setStreetName(r.getStreetName());
 				rvm.setStreetNo(r.getStreetNo());
@@ -891,6 +894,7 @@ public class Application extends Controller {
 						//map1.put("products",VMs);
 						WdRetailer r = cs.getWdRetailer();
 						RetailerVM rvm = new RetailerVM();
+						rvm.setId(r.getId());
 						rvm.setBusinessName(r.getBusinessName());
 						rvm.setStreetName(r.getStreetName());
 						rvm.setStreetNo(r.getStreetNo());
@@ -1040,6 +1044,7 @@ public class Application extends Controller {
 
 		WdRetailer r = p.getWdRetailer();
 		RetailerVM rvm = new RetailerVM();
+		rvm.setId(r.getId());
 		rvm.setBusinessName(r.getBusinessName());
 		rvm.setStreetName(r.getStreetName());
 		rvm.setStreetNo(r.getStreetNo());
@@ -1103,6 +1108,7 @@ public class Application extends Controller {
 			
 			WdRetailer r = p.getWdRetailer();
 			RetailerVM rvm = new RetailerVM();
+			rvm.setId(r.getId());
 			rvm.setBusinessName(r.getBusinessName());
 			rvm.setStreetName(r.getStreetName());
 			rvm.setStreetNo(r.getStreetNo());
@@ -1214,6 +1220,7 @@ public class Application extends Controller {
 		
 		WdRetailer r = p.getWdRetailer();
 		RetailerVM rvm = new RetailerVM();
+		rvm.setId(r.getId());
 		rvm.setBusinessName(r.getBusinessName());
 		rvm.setStreetName(r.getStreetName());
 		rvm.setStreetNo(r.getStreetNo());
