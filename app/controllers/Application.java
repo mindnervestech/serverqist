@@ -1287,8 +1287,10 @@ public class Application extends Controller {
 
                 customerSession.retailerVM = rvm;
 				customerSession.start = df1.format(c.getStart());
+				if(c.getEnd()!=null)
+				{
 				customerSession.end = df1.format(c.getEnd());
-				
+				}
 				List<SessionProduct> products = c.getSessionProducts();
 				for(SessionProduct s: products){
 						ProductVM pvm = new ProductVM();
@@ -1376,8 +1378,10 @@ public class Application extends Controller {
 
                 customerSession.retailerVM = rvm;
 				customerSession.start = df1.format(c.getStart());
-				customerSession.end = df1.format(c.getEnd());
-				
+				if(c.getEnd()!=null)
+				 {
+					customerSession.end = df1.format(c.getEnd());
+				 }
 				List<SessionProduct> products = c.getSessionProducts();
 				for(SessionProduct s: products){
 					if(s.isPurchased()){
