@@ -24,4 +24,5 @@ POST    /getRecentlyVisitedStores	            controllers.Application.getRecentl
 POST    /changeCustomerProfileImage             controllers.Application.changeCustomerProfileImage()
 POST    /addToCart                              controllers.Application.addToCart()
 POST    /getCustomerWishlist                    controllers.Application.getCustomerWishlist()
+POST    /confirmPurchaseOrder                   controllers.Application.confirmPurchaseOrder()
 GET    	/getCustomerProfileImage/:id            controllers.Application.getCustomerProfileImage(id:Long)

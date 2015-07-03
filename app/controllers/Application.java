@@ -760,6 +760,35 @@ public class Application extends Controller {
 		return null;
 	}
 
+	public static Result confirmPurchaseOrder(){
+		HashMap<String, Object> map = new HashMap<>();
+		JsonNode data = request().body().asJson();
+		Long userId = data.path("userId").asLong();
+		WdCustomer c = WdCustomer.findById(userId);
+		
+		if(c == null){
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			return ok(Json.toJson(map));
+		}else{
+			CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(c);
+			   if(cs1 != null){
+				   for(SessionProduct p : cs1.getSessionProducts()){
+					   if(p.getStatus().equals("Cart")){
+						  
+						   p.setPurchased(true);
+						   p.update();
+						   
+					   }
+				   }
+			   }
+		}
+		
+		map.put("status","200");
+		map.put("message","ok");
+		return ok(Json.toJson(map));
+	}
+	
 
 	public static Result getCustomerCart(){
 		HashMap<String, Object> map = new HashMap<>();
@@ -1063,6 +1092,8 @@ public class Application extends Controller {
 		map.put("data", res);
 		return ok(Json.toJson(map));
 	}
+	
+
 
 	public static Result scanProduct() throws ParseException{
 		HashMap<String, Object> map = new HashMap<>();
@@ -1334,7 +1365,7 @@ public class Application extends Controller {
 	public static  Result  getCustomerPurchaseHistory(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
-		
+		List<ProductVM> list = new ArrayList<ProductVM>();
 		Long userId = data.path("userId").asLong();
 		ArrayList<CustomerSessionVM> customerSessionVMs = new ArrayList<CustomerSessionVM>();
 		WdCustomer w = WdCustomer.findById(userId);
@@ -1349,46 +1380,7 @@ public class Application extends Controller {
 			for(CustomerSession c :  cs){
 				CustomerSessionVM customerSession = new CustomerSessionVM();
 				customerSession.id = c.getId();
-				
-				WdRetailer r =  c.getWdRetailer();
-                RetailerVM rvm = new RetailerVM();
-                rvm.setId(r.getId());
-                rvm.setBillingInformation(r.getBillingInformation());
-                rvm.setBusinessName(r.getBusinessName());
-                rvm.setCity(r.getCity());
-                rvm.setContactPerson(r.getContactPerson());
-                rvm.setEftpos(r.getEftpos());
-                rvm.setEftposProvider(r.getEftposProvider());
-                rvm.setFbLink(r.getFbLink());
-                rvm.setGoodsCategories(r.getGoodsCategories());
-                rvm.setGoogleLink(r.getGoogleLink());
-                rvm.setGstNo(r.getGstNo());
-                rvm.setIrNo(r.getIrNo());
-                rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
-                rvm.setMerchantId(r.getMerchantId());
-                rvm.setMobileNo(r.getMobileNo());
-                rvm.setPaymark(r.getPaymark());
-                rvm.setQistSku(r.getQistSku());
-                rvm.setReferedBy(r.getReferedBy());
-                rvm.setSkuPostfix(r.getSkuPostfix());
-                rvm.setStreetName(r.getStreetName());
-                rvm.setStreetNo(r.getStreetNo());
-                rvm.setSuburb(r.getSuburb());
-                rvm.setTitle(r.getTitle());
-                rvm.setTradingName(r.getTradingName());
-                rvm.setTwitterLink(r.getTwitterLink());
-                rvm.setWorkEmail(r.getWorkEmail());
-                rvm.setWorkPhone1(r.getWorkPhone1());
-                rvm.setWorkPhone2(r.getWorkPhone2());
-                rvm.setWorkUrl(r.getWorkUrl());
-                rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
 
-                customerSession.retailerVM = rvm;
-				customerSession.start = df1.format(c.getStart());
-				if(c.getEnd()!=null)
-				 {
-					customerSession.end = df1.format(c.getEnd());
-				 }
 				List<SessionProduct> products = c.getSessionProducts();
 				for(SessionProduct s: products){
 					if(s.isPurchased()){
@@ -1413,15 +1405,61 @@ public class Application extends Controller {
 							String url = PRODUCT_IMAGE + i.getProductImageName();
 							pvm.images.add(url);
 						}
+						list.add(pvm);
 						customerSession.products.add(pvm);
 					}
 				}
-				customerSessionVMs.add(customerSession);
-			}	
+
+				if(list.size()>0)
+				{
+					WdRetailer r =  c.getWdRetailer();
+					RetailerVM rvm = new RetailerVM();
+					rvm.setId(r.getId());
+					rvm.setBillingInformation(r.getBillingInformation());
+					rvm.setBusinessName(r.getBusinessName());
+					rvm.setCity(r.getCity());
+					rvm.setContactPerson(r.getContactPerson());
+					rvm.setEftpos(r.getEftpos());
+					rvm.setEftposProvider(r.getEftposProvider());
+					rvm.setFbLink(r.getFbLink());
+					rvm.setGoodsCategories(r.getGoodsCategories());
+					rvm.setGoogleLink(r.getGoogleLink());
+					rvm.setGstNo(r.getGstNo());
+					rvm.setIrNo(r.getIrNo());
+					rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
+					rvm.setMerchantId(r.getMerchantId());
+					rvm.setMobileNo(r.getMobileNo());
+					rvm.setPaymark(r.getPaymark());
+					rvm.setQistSku(r.getQistSku());
+					rvm.setReferedBy(r.getReferedBy());
+					rvm.setSkuPostfix(r.getSkuPostfix());
+					rvm.setStreetName(r.getStreetName());
+					rvm.setStreetNo(r.getStreetNo());
+					rvm.setSuburb(r.getSuburb());
+					rvm.setTitle(r.getTitle());
+					rvm.setTradingName(r.getTradingName());
+					rvm.setTwitterLink(r.getTwitterLink());
+					rvm.setWorkEmail(r.getWorkEmail());
+					rvm.setWorkPhone1(r.getWorkPhone1());
+					rvm.setWorkPhone2(r.getWorkPhone2());
+					rvm.setWorkUrl(r.getWorkUrl());
+					rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
+
+					customerSession.retailerVM = rvm;
+					customerSession.start = df1.format(c.getStart());
+					if(c.getEnd()!=null)
+					{
+						customerSession.end = df1.format(c.getEnd());
+					}
+
+					customerSessionVMs.add(customerSession);
+				}
+			}
 			map.put("status", "200");
 			map.put("message", "OK.");
 			map.put("data", customerSessionVMs);
 			return ok(Json.toJson(map));
+
 		}
 	} 
 	
