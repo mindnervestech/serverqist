@@ -810,7 +810,7 @@ public class Application extends Controller {
 			
 			if(cs1 != null){
 				for(SessionProduct p:cs1.getSessionProducts()){
-					if(p.getStatus().equals("Cart"))
+					if(p.getStatus().equals("Cart") && p.isPurchased()==false)
 					{
 					ProductVM vm = new ProductVM();
 					vm.id = p.getWdProduct().getId();
@@ -887,7 +887,7 @@ public class Application extends Controller {
 					ArrayList<ProductVM> VMs =  new ArrayList<ProductVM>();
 					CustomerSessionVM csvm = new CustomerSessionVM();
 					for(SessionProduct p:cs.getSessionProducts()){
-						if(p.getStatus().equals("Wishlist"))
+						if(p.getStatus().equals("Wishlist") && p.isPurchased()==false)
 						{
 							ProductVM vm = new ProductVM();
 							vm.id = p.getWdProduct().getId();
