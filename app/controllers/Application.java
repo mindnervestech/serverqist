@@ -765,6 +765,7 @@ public class Application extends Controller {
 		JsonNode data = request().body().asJson();
 		Long userId = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(userId);
+		Date today = new Date();
 		
 		if(c == null){
 			map.put("status", "500");
@@ -780,7 +781,10 @@ public class Application extends Controller {
 						   p.update();
 						   
 					   }
+					  
 				   }
+				   cs1.setEnd(today);
+				   cs1.update();
 			   }
 		}
 		
