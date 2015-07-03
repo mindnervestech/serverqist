@@ -784,6 +784,8 @@ public class Application extends Controller {
 					  
 				   }
 				   cs1.setEnd(today);
+				   
+				   
 				   cs1.update();
 			   }
 		}
@@ -864,6 +866,21 @@ public class Application extends Controller {
 		return ok(Json.toJson(map));
 	}
 	
+	public static String timecal(String databasetime){
+		Date d = new Date();
+		Date d1=null;
+        try {
+			d1=df1.parse(databasetime);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		long time=d.getTime()-d1.getTime();
+		long diffMinutes = time / (60 * 1000) % 60;
+		long diffHours = time / (60 * 60 * 1000) % 24;
+		long min=(diffHours *60)+diffMinutes;
+		return (min+"");
+	}
 	
 	public static Result getCustomerWishlist(){
 		HashMap<String, Object> map = new HashMap<>();
@@ -1332,7 +1349,9 @@ public class Application extends Controller {
 				if(c.getEnd()!=null)
 				{
 				customerSession.end = df1.format(c.getEnd());
+				customerSession.beforeTime=timecal(customerSession.end);
 				}
+				
 				List<SessionProduct> products = c.getSessionProducts();
 				for(SessionProduct s: products){
 						ProductVM pvm = new ProductVM();
@@ -1453,7 +1472,9 @@ public class Application extends Controller {
 					customerSession.start = df1.format(c.getStart());
 					if(c.getEnd()!=null)
 					{
+						
 						customerSession.end = df1.format(c.getEnd());
+						customerSession.beforeTime=timecal(customerSession.end);
 					}
 
 					customerSessionVMs.add(customerSession);

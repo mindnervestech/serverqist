@@ -9,5 +9,6 @@ public class CustomerSessionVM {
 	public List<ProductVM> products = new  ArrayList<>();
     public String start;
     public String end;
+    public String beforeTime;
     
 }
