@@ -1,5 +1,9 @@
 package models;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -140,7 +144,9 @@ public class WdRetailer extends Model {
 	
 	@OneToMany(mappedBy="wdRetailer")
 	private List<CustomerSession> customerSessions;
-
+	
+	
+ 
 	public WdRetailer() {
 	}
 
@@ -467,5 +473,12 @@ public class WdRetailer extends Model {
 	public static WdRetailer findById(Long id) {
 		return find.where().eq("id", id).findUnique();
 	}
+	
+    public static WdRetailer findByUser(WdUser u1)
+    {
+    	return find.where().eq("wdUser", u1).findUnique();
+    }
+	
+	
 	
 }

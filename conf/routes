@@ -25,4 +25,5 @@ POST    /changeCustomerProfileImage             controllers.Application.changeCu
 POST    /addToCart                              controllers.Application.addToCart()
 POST    /getCustomerWishlist                    controllers.Application.getCustomerWishlist()
 POST    /confirmPurchaseOrder                   controllers.Application.confirmPurchaseOrder()
+POST    /getNews                                controllers.Application.getNews()
 GET    	/getCustomerProfileImage/:id            controllers.Application.getCustomerProfileImage(id:Long)

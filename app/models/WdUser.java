@@ -1,5 +1,8 @@
 package models;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +19,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import play.db.ebean.Model;
+import play.db.ebean.Model.Finder;
 
 
 /**
@@ -182,6 +186,12 @@ public class WdUser extends Model {
 
 	public void setApprovedDate(Date approvedDate) {
 		this.approvedDate = approvedDate;
+	}
+	
+	public static Finder<Long,WdUser> find = new Finder<>(Long.class, WdUser.class);
+	
+	public static List<WdUser> findBydate(String s1){
+		return find.where().ge("createdOn", s1).findList();
 	}
 	
 }

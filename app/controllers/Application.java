@@ -16,6 +16,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,7 @@ import models.WdCustomer;
 import models.WdProduct;
 import models.WdProductImage;
 import models.WdRetailer;
+import models.WdUser;
 
 import org.w3c.dom.Document;
 
@@ -60,13 +62,18 @@ import play.mvc.Result;
 import viewmodels.CategoriesVM;
 import viewmodels.CustomerSessionVM;
 import viewmodels.CustomerVM;
+import viewmodels.NewsVM;
 import viewmodels.ProductVM;
 import viewmodels.RetailerVM;
 import views.html.index;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsService;
 
 public class Application extends Controller {
+	
+	public static final String lCertificate = Play.application().path().getAbsolutePath()+"/conf/Certificates9.p12";
 
 	//private static final String URL = "http://maps.googleapis.com/maps/api/geocode/json";
 	
@@ -570,6 +577,91 @@ public class Application extends Controller {
 		map.put("data", vm);
 		return ok(Json.toJson(map));
 	}
+	
+	
+	public static Result getNews(){
+		HashMap<String,Object> map = new HashMap<>();
+		
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -7);
+        Date todate1 = cal.getTime();    
+        String fromdate = dateFormat.format(todate1);
+        
+        List<WdUser> user = WdUser.findBydate(fromdate);
+       
+        List<NewsVM> VMn = new ArrayList<NewsVM>();
+        for(WdUser s:user){
+        	System.out.println("User Id "+s.getId());
+        	NewsVM vmn = new NewsVM();
+        	WdRetailer w=WdRetailer.findByUser(s);
+        	RetailerVM vm = new RetailerVM();
+			vm.setId(w.getId());
+			vm.setBusinessName(w.getBusinessName());
+			vm.setStreetName(w.getStreetName());
+			vm.setStreetNo(w.getStreetNo());
+			vm.setSuburb(w.getSuburb());
+			vm.setLogoImage(RETAILER_IMAGE + w.getLogoImage());
+			vm.setTradingName(w.getTradingName());
+			vm.setCity(w.getCity());
+			vm.setContactPerson(w.getContactPerson());
+			vm.setWorkEmail(w.getWorkEmail());
+			vm.setQistNo(w.getQistSku()+String.format("%07d", w.getSkuPostfix()));
+			vmn.news="New store \'"+w.getBusinessName()+"\' added.";
+			vmn.retailerData=vm;
+			VMn.add(vmn);
+        }
+        
+        List<WdProduct> product = WdProduct.findByProductDate(fromdate);
+        
+        for(WdProduct p : product)
+        {
+        	NewsVM vmn = new NewsVM();
+        	ProductVM vm = new ProductVM();
+			vm.id = p.getId();
+			vm.name = p.getName();
+			vm.description = p .getDescription();
+			vm.status = p .getStatus();
+			vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
+			vm.mfrSku = p.getMfrSku();
+			vm.storeSku = p.getStoreSku();
+			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
+			vm.qistPrice = p.getQistPrice();
+			if(p.getApprovedDate() != null){
+				vm.approvedDate = df.format(p.getApprovedDate());
+			}
+			vm.createdDate = df.format(p.getCreatedDate());
+			vm.updatedDate = df.format(p.getUpdatedDate());
+			vm.validFromDate = df.format(p.getValidFromDate());
+			vm.validToDate = df.format(p.getValidToDate());
+			for(WdProductImage i:p.getProductImages()){
+				String url = PRODUCT_IMAGE + i.getProductImageName();
+				vm.images.add(url);
+			}
+			
+			vmn.news="New prouct \'"+p.getName()+"\' added in store \'"+p.getWdRetailer().getBusinessName()+"\'";
+			vmn.productData=vm;
+			VMn.add(vmn);
+        }
+        
+       
+        map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", VMn);
+		return ok(Json.toJson(map));
+	}
+	
+	
+	public static Result sendPushNotification(String deviceToken, String msg) {
+	       System.out.println("sendPushNotification " + lCertificate);
+	       String password = "racing";
+	       ApnsService service =APNS.newService().withCert(lCertificate, password).withProductionDestination().build();
+	       System.out.println("sendPushNotification");
+	       String payload = APNS.newPayload().alertBody(msg).build();
+	       com.notnoop.apns.ApnsNotification notification = service.push(deviceToken, payload);
+	       System.out.println("Sending notification message!");
+	       return ok();
+	   }
 	
 	public static Result getMyOffers() throws Exception{
 		HashMap<String, Object> map = new HashMap<>();

@@ -334,6 +334,11 @@ public class WdProduct extends Model {
 		return find.byId(Id);
 	}
 	
+	public static List<WdProduct> findByProductDate(String s1)
+	{
+		return find.where().ge("createdDate", s1).findList();
+	}
+	
 	
 
 }
