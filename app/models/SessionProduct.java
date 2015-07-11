@@ -22,7 +22,7 @@ public class SessionProduct extends Model{
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	private String status;
-	private boolean purchased;
+	//private boolean purchased;
 	
 	@ManyToOne
 	@JoinColumn(name="session_id")
@@ -48,13 +48,13 @@ public class SessionProduct extends Model{
 		this.status = status;
 	}
 
-	public boolean isPurchased() {
+	/*public boolean isPurchased() {
 		return purchased;
-	}
+	}*/
 
-	public void setPurchased(boolean purchased) {
+	/*public void setPurchased(boolean purchased) {
 		this.purchased = purchased;
-	}
+	}*/
 
 	public CustomerSession getCustomerSession() {
 		return customerSession;

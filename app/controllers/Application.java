@@ -44,6 +44,8 @@ import models.CustomerSession;
 import models.SessionProduct;
 import models.WdCategory;
 import models.WdCustomer;
+import models.WdCustomerOrderDetail;
+import models.WdCustomerOrders;
 import models.WdProduct;
 import models.WdProductImage;
 import models.WdRetailer;
@@ -73,7 +75,7 @@ import com.notnoop.apns.ApnsService;
 
 public class Application extends Controller {
 	
-	public static final String lCertificate = Play.application().path().getAbsolutePath()+"/conf/Certificates9.p12";
+	public static final String lCertificate = Play.application().path().getAbsolutePath()+"/conf/NewFile.p12";
 
 	//private static final String URL = "http://maps.googleapis.com/maps/api/geocode/json";
 	
@@ -107,7 +109,13 @@ public class Application extends Controller {
 		String email = users.get("email");
 		String pass = users.get("password");
 		String repass = users.get("retypePassword");
-		String address = users.get("address");
+		/*String address = users.get("address");*/
+		String address1 = users.get("address1");
+		String address2 = users.get("address2");
+		String city = users.get("city");
+		String state = users.get("state");
+		String country = users.get("country");
+		String zip = users.get("zip");
 		String contactNo = users.get("contactNo");
 		Boolean qcart = Boolean.parseBoolean(users.get("qCartMailingList"));
 		String FacebookId = users.get("FacebookId");
@@ -130,7 +138,13 @@ public class Application extends Controller {
 					//vm.lastName = c.getLastname();
 					vm.email = cc.getEmail();
 					vm.password = cc.getPassword();
-					vm.address = cc.getAddress();
+					/*vm.address = cc.getAddress();*/
+					vm.address1 = cc.getAddress1();
+					vm.address2 = cc.getAddress2();
+					vm.city = cc.getCity();
+					vm.state = cc.getState();
+					vm.country = cc.getCountry();
+					vm.zip = cc.getZip();
 					vm.image = DOMAIN_URL+"getCustomerProfileImage/"+cc.getId();
 					vm.contactNo = cc.getContactNo();
 					vm.createdDate = df.format(cc.getCreatedDate());
@@ -163,7 +177,13 @@ public class Application extends Controller {
 					//vm.lastName = c.getLastname();
 					vm.email = cc.getEmail();
 					vm.password = cc.getPassword();
-					vm.address = cc.getAddress();
+					/*vm.address = cc.getAddress();*/
+					vm.address1 = cc.getAddress1();
+					vm.address2 = cc.getAddress2();
+					vm.city = cc.getCity();
+					vm.state = cc.getState();
+					vm.country = cc.getCountry();
+					vm.zip = cc.getZip();
 					vm.image = DOMAIN_URL+"getCustomerProfileImage/"+cc.getId();
 					vm.contactNo = cc.getContactNo();
 					vm.createdDate = df.format(cc.getCreatedDate());
@@ -196,7 +216,13 @@ public class Application extends Controller {
 					//vm.lastName = c.getLastname();
 					vm.email = cc.getEmail();
 					vm.password = cc.getPassword();
-					vm.address = cc.getAddress();
+					/*vm.address = cc.getAddress();*/
+					vm.address1 = cc.getAddress1();
+					vm.address2 = cc.getAddress2();
+					vm.city = cc.getCity();
+					vm.state = cc.getState();
+					vm.country = cc.getCountry();
+					vm.zip = cc.getZip();
 					vm.image = DOMAIN_URL+"getCustomerProfileImage/"+cc.getId();
 					vm.contactNo = cc.getContactNo();
 					vm.createdDate = df.format(cc.getCreatedDate());
@@ -251,7 +277,13 @@ public class Application extends Controller {
 		//c.setLastname(lname);
 		c.setEmail(email);
 		c.setPassword(pass);
-		c.setAddress(address);
+		/*c.setAddress(address);*/
+		c.setAddress1(address1);
+		c.setAddress2(address2);
+		c.setCity(city);
+		c.setState(state);
+		c.setCountry(country);
+		c.setZip(zip);
 		c.setContactNo(contactNo);
 		c.setImage(imageDataString);
 		if(qcart.toString().equals("true")){
@@ -339,7 +371,13 @@ public class Application extends Controller {
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
-		vm.address = c.getAddress();
+		/*vm.address = c.getAddress();*/
+		vm.address1 = c.getAddress1();
+		vm.address2 = c.getAddress2();
+		vm.city = c.getCity();
+		vm.state = c.getState();
+		vm.country = c.getCountry();
+		vm.zip = c.getZip();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = df.format(c.getCreatedDate());
@@ -391,7 +429,13 @@ public class Application extends Controller {
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
-		vm.address = c.getAddress();
+		/*vm.address = c.getAddress();*/
+		vm.address1 = c.getAddress1();
+		vm.address2 = c.getAddress2();
+		vm.city = c.getCity();
+		vm.state = c.getState();
+		vm.country = c.getCountry();
+		vm.zip = c.getZip();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = df.format(c.getCreatedDate());
@@ -453,7 +497,13 @@ public class Application extends Controller {
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
-		vm.address = c.getAddress();
+/*		vm.address = c.getAddress();*/
+		vm.address1 = c.getAddress1();
+		vm.address2 = c.getAddress2();
+		vm.city = c.getCity();
+		vm.state = c.getState();
+		vm.country = c.getCountry();
+		vm.zip = c.getZip();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = df.format(c.getCreatedDate());
@@ -490,7 +540,13 @@ public class Application extends Controller {
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
-		vm.address = c.getAddress();
+		/*vm.address = c.getAddress();*/
+		vm.address1 = c.getAddress1();
+		vm.address2 = c.getAddress2();
+		vm.city = c.getCity();
+		vm.state = c.getState();
+		vm.country = c.getCountry();
+		vm.zip = c.getZip();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = df.format(c.getCreatedDate());
@@ -526,7 +582,13 @@ public class Application extends Controller {
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
-		vm.address = c.getAddress();
+		/*vm.address = c.getAddress();*/
+		vm.address1 = c.getAddress1();
+		vm.address2 = c.getAddress2();
+		vm.city = c.getCity();
+		vm.state = c.getState();
+		vm.country = c.getCountry();
+		vm.zip = c.getZip();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = df.format(c.getCreatedDate());
@@ -553,7 +615,12 @@ public class Application extends Controller {
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}
-		c.setAddress(data.path("address").asText());
+		c.setAddress1(data.path("address1").asText());
+		c.setAddress2(data.path("address2").asText());
+		c.setCity(data.path("city").asText());
+		c.setState(data.path("state").asText());
+		c.setCountry(data.path("country").asText());
+		c.setZip(data.path("zip").asText());
 		c.setUpdatedDate(new Date());
 		c.update();
 		
@@ -563,7 +630,13 @@ public class Application extends Controller {
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
-		vm.address = c.getAddress();
+		/*vm.address = c.getAddress();*/
+		vm.address1 = c.getAddress1();
+		vm.address2 = c.getAddress2();
+		vm.city = c.getCity();
+		vm.state = c.getState();
+		vm.country = c.getCountry();
+		vm.zip = c.getZip();
 		vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 		vm.contactNo = c.getContactNo();
 		vm.createdDate = df.format(c.getCreatedDate());
@@ -652,15 +725,19 @@ public class Application extends Controller {
 	}
 	
 	
-	public static Result sendPushNotification(String deviceToken, String msg) {
+	public static Result sendPushNotification() {
+		HashMap<String,Object> map = new HashMap<>();
 	       System.out.println("sendPushNotification " + lCertificate);
-	       String password = "racing";
-	       ApnsService service =APNS.newService().withCert(lCertificate, password).withProductionDestination().build();
+	       String password = "123456";
+	       ApnsService service = APNS.newService().withCert(lCertificate, password)
+	    		   .withSandboxDestination()
+	    		   .build();
 	       System.out.println("sendPushNotification");
-	       String payload = APNS.newPayload().alertBody(msg).build();
-	       com.notnoop.apns.ApnsNotification notification = service.push(deviceToken, payload);
+	       String payload = APNS.newPayload().alertBody("hello..........").build();
+	       com.notnoop.apns.ApnsNotification notification = service.push("cc3a0cda5875545f5c86372418834d1dc80425df34fa73df5f030052ccf51a8a", payload);
 	       System.out.println("Sending notification message!");
-	       return ok();
+	       map.put("status", "200");
+	       return ok(Json.toJson(map));
 	   }
 	
 	public static Result getMyOffers() throws Exception{
@@ -857,31 +934,60 @@ public class Application extends Controller {
 		JsonNode data = request().body().asJson();
 		Long userId = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(userId);
-		Date today = new Date();
-		
-		if(c == null){
+		Date date = new Date();
+		if(c==null)
+		{
 			map.put("status", "500");
 			map.put("message", "User does not exist.");
-			return ok(Json.toJson(map));
+			return ok(Json.toJson(map));	
 		}else{
 			CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(c);
-			   if(cs1 != null){
-				   for(SessionProduct p : cs1.getSessionProducts()){
-					   if(p.getStatus().equals("Cart")){
-						  
-						   p.setPurchased(true);
-						   p.update();
-						   
-					   }
-					  
-				   }
-				   cs1.setEnd(today);
-				   
-				   
-				   cs1.update();
-			   }
+				if(cs1!=null){
+					WdCustomerOrders o = new WdCustomerOrders();
+					o.setWdCustomer(cs1.getWdCustomer());
+					o.setWdRetailer(cs1.getWdRetailer());
+					o.setBillingAddress1(cs1.getWdCustomer().getAddress1());
+					o.setBillingAddress2(cs1.getWdCustomer().getAddress2());
+					o.setBillingCity(cs1.getWdCustomer().getCity());
+					o.setBillingState(cs1.getWdCustomer().getState());
+					o.setBillingCountry(cs1.getWdCustomer().getCountry());
+					o.setBillingZip(cs1.getWdCustomer().getZip());
+					o.setShippingAddress1(cs1.getWdCustomer().getAddress1());
+					o.setShippingAddress2(cs1.getWdCustomer().getAddress2());
+					o.setShippingCity(cs1.getWdCustomer().getCity());
+					o.setShippingState(cs1.getWdCustomer().getState());
+					o.setShippingCountry(cs1.getWdCustomer().getCountry());
+					o.setShippingZip(cs1.getWdCustomer().getZip());
+					o.setStatus("pending");
+					o.setCreatedDate(date);
+					o.setUpdatedDate(date);
+					o.save();
+					
+					
+					//create and save customer order with all details
+					
+					for(SessionProduct p : cs1.getSessionProducts()){
+						if(p.getStatus().equals("Cart")){
+							
+							//create and save customer order details for each session product in cart
+							WdCustomerOrderDetail od = new WdCustomerOrderDetail();
+							od.setWdCustomerOrder(o);
+							od.setProductId(p.getWdProduct().getId());
+							od.setCreatedDate(date);
+							od.setUpdatedDate(date);
+							od.setQuantity(1L);
+							od.setProductPrice(p.getWdProduct().getQistPrice());
+							od.save();
+							p.setStatus("None");
+							p.update();
+							
+							
+						}
+					}
+					cs1.setEnd(date);
+					cs1.update();
+				}
 		}
-		
 		map.put("status","200");
 		map.put("message","ok");
 		return ok(Json.toJson(map));
@@ -908,7 +1014,7 @@ public class Application extends Controller {
 			
 			if(cs1 != null){
 				for(SessionProduct p:cs1.getSessionProducts()){
-					if(p.getStatus().equals("Cart") && p.isPurchased()==false)
+					if(p.getStatus().equals("Cart"))
 					{
 					ProductVM vm = new ProductVM();
 					vm.id = p.getWdProduct().getId();
@@ -1000,7 +1106,7 @@ public class Application extends Controller {
 					ArrayList<ProductVM> VMs =  new ArrayList<ProductVM>();
 					CustomerSessionVM csvm = new CustomerSessionVM();
 					for(SessionProduct p:cs.getSessionProducts()){
-						if(p.getStatus().equals("Wishlist") && p.isPurchased()==false)
+						if(p.getStatus().equals("Wishlist"))
 						{
 							ProductVM vm = new ProductVM();
 							vm.id = p.getWdProduct().getId();
@@ -1118,7 +1224,7 @@ public class Application extends Controller {
         		}
 				SessionProduct sp  = new  SessionProduct() ;
 				sp.setWdProduct(p);
-				sp.setPurchased(false);
+				/*sp.setPurchased(false);*/
 				sp.setCustomerSession(cs1);
 				sp.setStatus("Cart");
 				sp.save();
@@ -1137,7 +1243,7 @@ public class Application extends Controller {
 				cs1.save();
 				SessionProduct sp  = new  SessionProduct() ;
 				sp.setWdProduct(p);
-				sp.setPurchased(false);
+				/*sp.setPurchased(false);*/
 				sp.setCustomerSession(cs1);
 				sp.setStatus("Cart");
 				sp.save();
@@ -1151,7 +1257,7 @@ public class Application extends Controller {
 			cs1.save();
 			SessionProduct sp  = new  SessionProduct() ;
 			sp.setWdProduct(p);
-			sp.setPurchased(false);
+			/*sp.setPurchased(false);*/
 			sp.setCustomerSession(cs1);
 			sp.setStatus("Cart");
 			sp.save();
@@ -1298,7 +1404,7 @@ public class Application extends Controller {
         		}
         		SessionProduct sp  = new  SessionProduct() ;
         		sp.setWdProduct(p);
-        		sp.setPurchased(false);
+        		/*sp.setPurchased(false);*/
         		sp.setCustomerSession(cs1);
         		sp.setStatus("Cart");
         		sp.save();
@@ -1317,7 +1423,7 @@ public class Application extends Controller {
     			cs1.save();
     			SessionProduct sp  = new  SessionProduct() ;
         		sp.setWdProduct(p);
-        		sp.setPurchased(false);
+        	/*	sp.setPurchased(false);*/
         		sp.setCustomerSession(cs1);
         		sp.setStatus("Cart");
         		sp.save();
@@ -1331,7 +1437,7 @@ public class Application extends Controller {
 			cs1.save();
 			SessionProduct sp  = new  SessionProduct() ;
     		sp.setWdProduct(p);
-    		sp.setPurchased(false);
+    		/*sp.setPurchased(false);*/
     		sp.setCustomerSession(cs1);
     		sp.setStatus("Cart");
     		sp.save();
@@ -1478,7 +1584,7 @@ public class Application extends Controller {
 		}
 	}
 	public static  Result  getCustomerPurchaseHistory(){
-		HashMap<String, Object> map = new HashMap<>();
+		/*HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		List<ProductVM> list = new ArrayList<ProductVM>();
 		Long userId = data.path("userId").asLong();
@@ -1577,7 +1683,8 @@ public class Application extends Controller {
 			map.put("data", customerSessionVMs);
 			return ok(Json.toJson(map));
 
-		}
+		}*/
+		return ok();
 	} 
 	
 	public static void sendPasswordMail(String email,String pass) {
@@ -1666,7 +1773,13 @@ public class Application extends Controller {
 			//vm.lastName = c.getLastname();
 			vm.email = c.getEmail();
 			vm.password = c.getPassword();
-			vm.address = c.getAddress();
+			/*vm.address = c.getAddress();*/
+			vm.address1 = c.getAddress1();
+			vm.address2 = c.getAddress2();
+			vm.city = c.getCity();
+			vm.state = c.getState();
+			vm.country = c.getCountry();
+			vm.zip = c.getZip();
 			vm.image = DOMAIN_URL+"getCustomerProfileImage/"+c.getId();
 			vm.contactNo = c.getContactNo();
 			vm.createdDate = df.format(c.getCreatedDate());

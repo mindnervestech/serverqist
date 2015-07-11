@@ -9,7 +9,7 @@ public class CustomerVM {
 	public String email;
 	public String password;
 	public String retypePassword;
-	public String address;
+	/*public String address;*/
 	public String contactNo;
 	public String image;
 	public String FacebookId;
@@ -21,6 +21,12 @@ public class CustomerVM {
 	public String type;
 	public String createdDate;
 	public String updatedDate;
+	public String address1;
+	public String address2;
+	public String city;
+	public String state;
+	public String country;
+	public String zip;
 	
 	public String name;
 	

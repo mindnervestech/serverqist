@@ -128,6 +128,9 @@ public class WdRetailer extends Model {
 	//bi-directional many-to-one association to WdProduct
 	@OneToMany(mappedBy="wdRetailer")
 	private List<WdProduct> wdProducts;
+	
+	@OneToMany(mappedBy="wdRetailer")
+	private List<WdCustomerOrders> wdCustomerOrders;
 
 	//bi-directional many-to-one association to WdStaff
 	@ManyToOne
