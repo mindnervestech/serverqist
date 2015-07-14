@@ -15,6 +15,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import play.db.ebean.Model;
+import play.db.ebean.Model.Finder;
 
 @Entity
 @Table(name="wd_customer_orders")
@@ -235,8 +236,11 @@ public class WdCustomerOrders extends Model{
 		this.wdCustomerOrderDetail = wdCustomerOrderDetail;
 	}
 	
+	public static Finder<Long, WdCustomerOrders> find = new Finder<>(Long.class, WdCustomerOrders.class);
 	
-	
+	public static List<WdCustomerOrders> findById(WdCustomer id){
+		return find.where().eq("wdCustomer", id).findList();
+	}
 	
 	
 }

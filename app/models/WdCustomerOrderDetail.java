@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import play.db.ebean.Model;
+import play.db.ebean.Model.Finder;
 
 @Entity
 @Table(name="wd_customer_order_details")
@@ -98,6 +100,11 @@ public class WdCustomerOrderDetail extends Model {
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
 	}
- 
+	
+	public static Finder<Long, WdCustomerOrderDetail> find = new Finder<>(Long.class, WdCustomerOrderDetail.class);
+	
+	public static List<WdCustomerOrderDetail> findByOrderId(WdCustomerOrders wdCustomerOrder){
+		return find.where().eq("wdCustomerOrder", wdCustomerOrder).findList();
+	}
 	
 }

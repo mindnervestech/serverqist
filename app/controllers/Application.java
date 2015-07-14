@@ -62,6 +62,7 @@ import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 import viewmodels.CategoriesVM;
+import viewmodels.CustomerOrderVM;
 import viewmodels.CustomerSessionVM;
 import viewmodels.CustomerVM;
 import viewmodels.NewsVM;
@@ -933,6 +934,12 @@ public class Application extends Controller {
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long userId = data.path("userId").asLong();
+		String address1 = data.path("address1").asText();
+		String address2 = data.path("address2").asText();
+		String city = data.path("city").asText();
+		String state = data.path("state").asText();
+		String country = data.path("country").asText();
+		String zip = data.path("zip").asText();
 		WdCustomer c = WdCustomer.findById(userId);
 		Date date = new Date();
 		if(c==null)
@@ -952,12 +959,12 @@ public class Application extends Controller {
 					o.setBillingState(cs1.getWdCustomer().getState());
 					o.setBillingCountry(cs1.getWdCustomer().getCountry());
 					o.setBillingZip(cs1.getWdCustomer().getZip());
-					o.setShippingAddress1(cs1.getWdCustomer().getAddress1());
-					o.setShippingAddress2(cs1.getWdCustomer().getAddress2());
-					o.setShippingCity(cs1.getWdCustomer().getCity());
-					o.setShippingState(cs1.getWdCustomer().getState());
-					o.setShippingCountry(cs1.getWdCustomer().getCountry());
-					o.setShippingZip(cs1.getWdCustomer().getZip());
+					o.setShippingAddress1(address1);
+					o.setShippingAddress2(address2);
+					o.setShippingCity(city);
+					o.setShippingState(state);
+					o.setShippingCountry(country);
+					o.setShippingZip(zip);
 					o.setStatus("pending");
 					o.setCreatedDate(date);
 					o.setUpdatedDate(date);
@@ -1584,107 +1591,95 @@ public class Application extends Controller {
 		}
 	}
 	public static  Result  getCustomerPurchaseHistory(){
-		/*HashMap<String, Object> map = new HashMap<>();
+		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
-		List<ProductVM> list = new ArrayList<ProductVM>();
 		Long userId = data.path("userId").asLong();
-		ArrayList<CustomerSessionVM> customerSessionVMs = new ArrayList<CustomerSessionVM>();
-		WdCustomer w = WdCustomer.findById(userId);
+		List<CustomerOrderVM> VMc = new ArrayList<>();
+		WdCustomer w = WdCustomer.findById(userId); 
 
-		if(w == null){
-			map.put("status", "500");
+		if(w == null)
+		{
+			map.put("status","500");
 			map.put("message", "User does not exist.");
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}else{
-			List<CustomerSession>  cs = CustomerSession.getCustomerSessionByCustomerId(w);
-			for(CustomerSession c :  cs){
-				CustomerSessionVM customerSession = new CustomerSessionVM();
-				customerSession.id = c.getId();
+			List<WdCustomerOrders> wco = WdCustomerOrders.findById(w);
+			for(WdCustomerOrders o :wco){
+				CustomerOrderVM co = new CustomerOrderVM();
+				
+				RetailerVM rvm = new RetailerVM();
+				rvm.setId(o.getWdRetailer().getId());
+				rvm.setBillingInformation(o.getWdRetailer().getBillingInformation());
+				rvm.setBusinessName(o.getWdRetailer().getBusinessName());
+				rvm.setCity(o.getWdRetailer().getCity());
+				rvm.setContactPerson(o.getWdRetailer().getContactPerson());
+				rvm.setEftpos(o.getWdRetailer().getEftpos());
+				rvm.setEftposProvider(o.getWdRetailer().getEftposProvider());
+				rvm.setFbLink(o.getWdRetailer().getFbLink());
+				rvm.setGoodsCategories(o.getWdRetailer().getGoodsCategories());
+				rvm.setGoogleLink(o.getWdRetailer().getGoogleLink());
+				rvm.setGstNo(o.getWdRetailer().getGstNo());
+				rvm.setIrNo(o.getWdRetailer().getIrNo());
+				rvm.setLogoImage(RETAILER_IMAGE + o.getWdRetailer().getLogoImage());
+				rvm.setMerchantId(o.getWdRetailer().getMerchantId());
+				rvm.setMobileNo(o.getWdRetailer().getMobileNo());
+				rvm.setPaymark(o.getWdRetailer().getPaymark());
+				rvm.setQistSku(o.getWdRetailer().getQistSku());
+				rvm.setReferedBy(o.getWdRetailer().getReferedBy());
+				rvm.setSkuPostfix(o.getWdRetailer().getSkuPostfix());
+				rvm.setStreetName(o.getWdRetailer().getStreetName());
+				rvm.setStreetNo(o.getWdRetailer().getStreetNo());
+				rvm.setSuburb(o.getWdRetailer().getSuburb());
+				rvm.setTitle(o.getWdRetailer().getTitle());
+				rvm.setTradingName(o.getWdRetailer().getTradingName());
+				rvm.setTwitterLink(o.getWdRetailer().getTwitterLink());
+				rvm.setWorkEmail(o.getWdRetailer().getWorkEmail());
+				rvm.setWorkPhone1(o.getWdRetailer().getWorkPhone1());
+				rvm.setWorkPhone2(o.getWdRetailer().getWorkPhone2());
+				rvm.setWorkUrl(o.getWdRetailer().getWorkUrl());
+				rvm.setQistNo(o.getWdRetailer().getQistSku()+String.format("%07d", o.getWdRetailer().getSkuPostfix()));
 
-				List<SessionProduct> products = c.getSessionProducts();
-				for(SessionProduct s: products){
-					if(s.isPurchased()){
-						ProductVM pvm = new ProductVM();
-						pvm.id = s.getWdProduct().getId();
-						pvm.description = s.getWdProduct().getDescription();
-						pvm.isApproved =Boolean.parseBoolean(s.getWdProduct().getIsApproved());
-						pvm.mfrSku = s.getWdProduct().getMfrSku();
-						pvm.name = s.getWdProduct().getName();
-						pvm.qistNo = s.getWdProduct().getQistSku()+String.format("%07d", s.getWdProduct().getSkuPostfix());
-						pvm.status = s.getWdProduct().getStatus();
-						pvm.storeSku = s.getWdProduct().getStoreSku();
-						pvm.qistPrice = s.getWdProduct().getQistPrice();
-						if(s.getWdProduct().getApprovedDate() != null){
-							pvm.approvedDate = df.format(s.getWdProduct().getApprovedDate());
-						}
-						pvm.createdDate = df.format(s.getWdProduct().getCreatedDate());
-						pvm.updatedDate = df.format(s.getWdProduct().getUpdatedDate());
-						pvm.validFromDate = df.format(s.getWdProduct().getValidFromDate());
-						pvm.validToDate = df.format(s.getWdProduct().getValidToDate());
-						for(WdProductImage i:s.getWdProduct().getProductImages()){
-							String url = PRODUCT_IMAGE + i.getProductImageName();
-							pvm.images.add(url);
-						}
-						list.add(pvm);
-						customerSession.products.add(pvm);
+				co.retailer=rvm;
+
+				List<WdCustomerOrderDetail> wcod = WdCustomerOrderDetail.findByOrderId(o);
+				for(WdCustomerOrderDetail od : wcod){
+					WdProduct p = WdProduct.findByProductId(od.getProductId());
+
+					ProductVM pvm = new ProductVM();
+					pvm.id = p.getId();
+					pvm.description = p.getDescription();
+					pvm.isApproved =Boolean.parseBoolean(p.getIsApproved());
+					pvm.mfrSku =p.getMfrSku();
+					pvm.name = p.getName();
+					pvm.qistNo = p.getQistSku()+String.format("%07d", p.getSkuPostfix());
+					pvm.status = p.getStatus();
+					pvm.storeSku = p.getStoreSku();
+					pvm.qistPrice = p.getQistPrice();
+					if(p.getApprovedDate() != null){
+						pvm.approvedDate = df.format(p.getApprovedDate());
 					}
-				}
-
-				if(list.size()>0)
-				{
-					WdRetailer r =  c.getWdRetailer();
-					RetailerVM rvm = new RetailerVM();
-					rvm.setId(r.getId());
-					rvm.setBillingInformation(r.getBillingInformation());
-					rvm.setBusinessName(r.getBusinessName());
-					rvm.setCity(r.getCity());
-					rvm.setContactPerson(r.getContactPerson());
-					rvm.setEftpos(r.getEftpos());
-					rvm.setEftposProvider(r.getEftposProvider());
-					rvm.setFbLink(r.getFbLink());
-					rvm.setGoodsCategories(r.getGoodsCategories());
-					rvm.setGoogleLink(r.getGoogleLink());
-					rvm.setGstNo(r.getGstNo());
-					rvm.setIrNo(r.getIrNo());
-					rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
-					rvm.setMerchantId(r.getMerchantId());
-					rvm.setMobileNo(r.getMobileNo());
-					rvm.setPaymark(r.getPaymark());
-					rvm.setQistSku(r.getQistSku());
-					rvm.setReferedBy(r.getReferedBy());
-					rvm.setSkuPostfix(r.getSkuPostfix());
-					rvm.setStreetName(r.getStreetName());
-					rvm.setStreetNo(r.getStreetNo());
-					rvm.setSuburb(r.getSuburb());
-					rvm.setTitle(r.getTitle());
-					rvm.setTradingName(r.getTradingName());
-					rvm.setTwitterLink(r.getTwitterLink());
-					rvm.setWorkEmail(r.getWorkEmail());
-					rvm.setWorkPhone1(r.getWorkPhone1());
-					rvm.setWorkPhone2(r.getWorkPhone2());
-					rvm.setWorkUrl(r.getWorkUrl());
-					rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
-
-					customerSession.retailerVM = rvm;
-					customerSession.start = df1.format(c.getStart());
-					if(c.getEnd()!=null)
-					{
-						
-						customerSession.end = df1.format(c.getEnd());
-						customerSession.beforeTime=timecal(customerSession.end);
+					pvm.createdDate = df.format(p.getCreatedDate());
+					pvm.updatedDate = df.format(p.getUpdatedDate());
+					pvm.validFromDate = df.format(p.getValidFromDate());
+					pvm.validToDate = df.format(p.getValidToDate());
+					for(WdProductImage i:p.getProductImages()){
+						String url = PRODUCT_IMAGE + i.getProductImageName();
+						pvm.images.add(url);
 					}
 
-					customerSessionVMs.add(customerSession);
+					co.product.add(pvm);
 				}
+                co.createDate=df1.format(o.getCreatedDate());
+                co.beforeTime=timecal(co.createDate);
+				VMc.add(co);
 			}
-			map.put("status", "200");
-			map.put("message", "OK.");
-			map.put("data", customerSessionVMs);
-			return ok(Json.toJson(map));
+		}
 
-		}*/
-		return ok();
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data",VMc);
+		return ok(Json.toJson(map));
 	} 
 	
 	public static void sendPasswordMail(String email,String pass) {
