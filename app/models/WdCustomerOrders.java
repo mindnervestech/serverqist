@@ -241,6 +241,4 @@ public class WdCustomerOrders extends Model{
 	public static List<WdCustomerOrders> findById(WdCustomer id){
 		return find.where().eq("wdCustomer", id).findList();
 	}
-	
-	
 }

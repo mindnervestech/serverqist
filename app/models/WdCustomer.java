@@ -32,8 +32,7 @@ public class WdCustomer extends Model {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 
-	@Lob
-	private String address;
+	
 
 	@Column(name="contact_no")
 	private String contactNo;
@@ -118,13 +117,9 @@ public class WdCustomer extends Model {
 		this.id = id;
 	}
 
-	public String getAddress() {
-		return this.address;
-	}
+	
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+	
 
 	public String getContactNo() {
 		return this.contactNo;

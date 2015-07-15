@@ -969,13 +969,9 @@ public class Application extends Controller {
 					o.setCreatedDate(date);
 					o.setUpdatedDate(date);
 					o.save();
-					
-					
 					//create and save customer order with all details
-					
 					for(SessionProduct p : cs1.getSessionProducts()){
 						if(p.getStatus().equals("Cart")){
-							
 							//create and save customer order details for each session product in cart
 							WdCustomerOrderDetail od = new WdCustomerOrderDetail();
 							od.setWdCustomerOrder(o);
@@ -986,9 +982,7 @@ public class Application extends Controller {
 							od.setProductPrice(p.getWdProduct().getQistPrice());
 							od.save();
 							p.setStatus("None");
-							p.update();
-							
-							
+							p.update();	
 						}
 					}
 					cs1.setEnd(date);
