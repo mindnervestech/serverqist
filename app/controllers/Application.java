@@ -973,12 +973,21 @@ public class Application extends Controller {
 					WdCustomerOrders o = new WdCustomerOrders();
 					o.setWdCustomer(cs1.getWdCustomer());
 					o.setWdRetailer(cs1.getWdRetailer());
-					o.setBillingAddress1(cs1.getWdCustomer().getAddress1());
-					o.setBillingAddress2(cs1.getWdCustomer().getAddress2());
-					o.setBillingCity(cs1.getWdCustomer().getCity());
-					o.setBillingState(cs1.getWdCustomer().getState());
-					o.setBillingCountry(cs1.getWdCustomer().getCountry());
-					o.setBillingZip(cs1.getWdCustomer().getZip());
+					if(cs1.getWdCustomer().getAddress1() != null){
+						o.setBillingAddress1(cs1.getWdCustomer().getAddress1());
+						o.setBillingAddress2(cs1.getWdCustomer().getAddress2());
+						o.setBillingCity(cs1.getWdCustomer().getCity());
+						o.setBillingState(cs1.getWdCustomer().getState());
+						o.setBillingCountry(cs1.getWdCustomer().getCountry());
+						o.setBillingZip(cs1.getWdCustomer().getZip());
+					} else {
+						o.setBillingAddress1(address1);
+						o.setBillingAddress2(address2);
+						o.setBillingCity(city);
+						o.setBillingState(state);
+						o.setBillingCountry(country);
+						o.setBillingZip(zip);
+					}
 					o.setShippingAddress1(address1);
 					o.setShippingAddress2(address2);
 					o.setShippingCity(city);
