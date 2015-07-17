@@ -27,4 +27,5 @@ POST    /getCustomerWishlist                    controllers.Application.getCusto
 POST    /confirmPurchaseOrder                   controllers.Application.confirmPurchaseOrder()
 POST    /getNews                                controllers.Application.getNews()
 POST    /sendPushNotification                   controllers.Application.sendPushNotification()
+POST    /sendPushNotification1                  controllers.Application.sendPushNotification1()
 GET    	/getCustomerProfileImage/:id            controllers.Application.getCustomerProfileImage(id:Long)

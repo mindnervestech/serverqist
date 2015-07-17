@@ -728,18 +728,38 @@ public class Application extends Controller {
 	
 	public static Result sendPushNotification() {
 		HashMap<String,Object> map = new HashMap<>();
-	       System.out.println("sendPushNotification " + lCertificate);
-	       String password = "123456";
-	       ApnsService service = APNS.newService().withCert(lCertificate, password)
-	    		   .withSandboxDestination()
-	    		   .build();
-	       System.out.println("sendPushNotification");
-	       String payload = APNS.newPayload().alertBody("hello..........").build();
-	       com.notnoop.apns.ApnsNotification notification = service.push("cc3a0cda5875545f5c86372418834d1dc80425df34fa73df5f030052ccf51a8a", payload);
-	       System.out.println("Sending notification message!");
-	       map.put("status", "200");
-	       return ok(Json.toJson(map));
-	   }
+		System.out.println("sendPushNotification " + lCertificate);
+		String password = "123456";
+		ApnsService service = APNS.newService().withCert(lCertificate, password)
+				.withSandboxDestination()
+				.build();
+		System.out.println("sendPushNotification");
+		String payload = APNS.newPayload().alertBody("hello..........").build();
+		com.notnoop.apns.ApnsNotification notification = service.push("cc3a0cda5875545f5c86372418834d1dc80425df34fa73df5f030052ccf51a8a", payload);
+		System.out.println("Sending notification message!");
+		map.put("status", "200");
+		return ok(Json.toJson(map));
+	}
+
+	private static final String AUTHORIZATION_KEY = "AIzaSyBLKOwfgUvHxVy6MxDS57XjXSnJWgwR_rI";
+	
+	//senderID = 495831502323
+
+	public static Result sendPushNotification1() {
+		HashMap<String,Object> map = new HashMap<>();
+		try {
+			com.google.android.gcm.server.Sender sender = new com.google.android.gcm.server.Sender(AUTHORIZATION_KEY);
+			com.google.android.gcm.server.Message message = new com.google.android.gcm.server.Message.Builder().timeToLive(30).collapseKey("message")
+					.delayWhileIdle(true)
+					.addData("message", "HELLO...").build();
+			com.google.android.gcm.server.Result result = sender.send(message, "APA91bEK8D6FEe5bC6NYnbN_VvIwh3xk6dmrqrAiqQKQ4zZHi2JM2LDJDuW-RNvhRxn9DK6gzQDKkCh-uW3aSi8dDnaBCU87b1SkfdpHzo1-0oyrI4QwsmfGeuE9HTNO9bXKT3-CvROQ", 1);
+			System.out.println(result);
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		map.put("status", "200");
+		return ok(Json.toJson(map));
+	}
 	
 	public static Result getMyOffers() throws Exception{
 		HashMap<String, Object> map = new HashMap<>();
