@@ -12,10 +12,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
 
 @Entity
 @Table(name="wd_customer_orders")
@@ -82,6 +82,10 @@ public class WdCustomerOrders extends Model{
 	
 	@OneToMany(mappedBy="wdCustomerOrder")
 	private List<WdCustomerOrderDetail> wdCustomerOrderDetail;
+	
+	@OneToOne
+	@JoinColumn(name = "session_id")
+	public CustomerSession session;
 
 	public Long getId() {
 		return id;
@@ -236,6 +240,16 @@ public class WdCustomerOrders extends Model{
 		this.wdCustomerOrderDetail = wdCustomerOrderDetail;
 	}
 	
+	public CustomerSession getSession() {
+		return session;
+	}
+
+	public void setSession(CustomerSession session) {
+		this.session = session;
+	}
+
+
+
 	public static Finder<Long, WdCustomerOrders> find = new Finder<>(Long.class, WdCustomerOrders.class);
 	
 	public static List<WdCustomerOrders> findById(WdCustomer id){

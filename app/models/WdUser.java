@@ -191,7 +191,7 @@ public class WdUser extends Model {
 	public static Finder<Long,WdUser> find = new Finder<>(Long.class, WdUser.class);
 	
 	public static List<WdUser> findBydate(String s1){
-		return find.where().ge("createdOn", s1).findList();
+		return find.where().ge("createdOn", s1).eq("userType", "retailer").findList();
 	}
 	
 }

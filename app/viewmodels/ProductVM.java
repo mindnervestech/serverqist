@@ -23,4 +23,6 @@ public class ProductVM {
 	public List<String> categories = new ArrayList<>();
 	public List<String> images = new ArrayList<>();
 	
+	public String availability;
+	
 }

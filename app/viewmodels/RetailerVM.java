@@ -1,18 +1,14 @@
 package viewmodels;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Id;
-
-import models.Campaign;
 import models.CustomerSession;
-import models.WdProduct;
 import models.WdStaff;
 import models.WdUser;
 
 public class RetailerVM {
 
-	@Id
 	private Long id;
 
 	private String billingInformation;
@@ -71,18 +67,25 @@ public class RetailerVM {
 
 	private String workUrl;
 
-	private List<WdProduct> wdProducts;
+	private List<ProductVM> products = new ArrayList<>();
 
 	private WdStaff wdStaff;
 
 	private WdUser wdUser;
 	
-	private List<Campaign> campaigns;
-	
 	private String qistNo;
 	
-	
-	private List<CustomerSession> customerSessions;
+	private List<CustomerSession> customerSessions = new ArrayList<>();
+
+
+	public List<ProductVM> getProducts() {
+		return products;
+	}
+
+
+	public void setProducts(List<ProductVM> products) {
+		this.products = products;
+	}
 
 
 	public Long getId() {
@@ -385,16 +388,6 @@ public class RetailerVM {
 	}
 
 
-	public List<WdProduct> getWdProducts() {
-		return wdProducts;
-	}
-
-
-	public void setWdProducts(List<WdProduct> wdProducts) {
-		this.wdProducts = wdProducts;
-	}
-
-
 	public WdStaff getWdStaff() {
 		return wdStaff;
 	}
@@ -412,16 +405,6 @@ public class RetailerVM {
 
 	public void setWdUser(WdUser wdUser) {
 		this.wdUser = wdUser;
-	}
-
-
-	public List<Campaign> getCampaigns() {
-		return campaigns;
-	}
-
-
-	public void setCampaigns(List<Campaign> campaigns) {
-		this.campaigns = campaigns;
 	}
 
 

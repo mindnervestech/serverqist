@@ -75,11 +75,11 @@ import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
 
 public class Application extends Controller {
-	
+
 	public static final String lCertificate = Play.application().path().getAbsolutePath()+"/conf/NewFile.p12";
 
 	//private static final String URL = "http://maps.googleapis.com/maps/api/geocode/json";
-	
+
 	private static final double dist = 5.0;
 	final static String FILEPATH = Play.application().configuration().getString("filePath");
 	final static String DOMAIN_URL = Play.application().configuration().getString("domainUrl");
@@ -87,7 +87,7 @@ public class Application extends Controller {
 	final static String RETAILER_IMAGE =Play.application().configuration().getString("retailerImage");
 	final static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 	final static DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-	
+
 	public static Result index() {
 		return ok(index.render("Your new application is ready."));
 	}
@@ -101,7 +101,7 @@ public class Application extends Controller {
 		if(!subFolder.exists()){
 			subFolder.mkdir();
 		}
-		
+
 		HashMap<String, Object> map = new HashMap<>();
 		DynamicForm users = Form.form().bindFromRequest();
 
@@ -124,12 +124,12 @@ public class Application extends Controller {
 		String TwitterId = users.get("TwitterId");
 		String imageUrl = users.get("imageUrl");
 		String imageDataString = null ;
-		
+
 		WdCustomer c = new WdCustomer();
-		
+
 		if((FacebookId != null && !FacebookId.isEmpty()) || (GooglePlusId != null && !GooglePlusId.isEmpty()) 
 				|| (TwitterId != null && !TwitterId.isEmpty())){
-			
+
 			if(FacebookId != null && !FacebookId.isEmpty()){
 				WdCustomer cc = WdCustomer.findByFbId(FacebookId);
 				if(cc != null){
@@ -153,10 +153,10 @@ public class Application extends Controller {
 					vm.lastActive = df.format(cc.getLastActive());
 					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
 					vm.qistNo = cc.getQistSku()+String.format("%07d", cc.getSkuPostfix());
-					
+
 					cc.setLastActive(new Date());
 					cc.update();
-					
+
 					HashMap<String, Object> map1 = new HashMap<>();
 					map1.put("CTPYE", "S");
 					map1.put("CustomerID", cc.getId().toString());
@@ -192,10 +192,10 @@ public class Application extends Controller {
 					vm.lastActive = df.format(cc.getLastActive());
 					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
 					vm.qistNo = cc.getQistSku()+String.format("%07d", cc.getSkuPostfix());
-					
+
 					cc.setLastActive(new Date());
 					cc.update();
-					
+
 					HashMap<String, Object> map1 = new HashMap<>();
 					map1.put("CTPYE", "S");
 					map1.put("CustomerID", cc.getId().toString());
@@ -231,10 +231,10 @@ public class Application extends Controller {
 					vm.lastActive = df.format(cc.getLastActive());
 					vm.qCartMailingList = Boolean.parseBoolean(cc.getQCartMailingList());
 					vm.qistNo = cc.getQistSku()+String.format("%07d", cc.getSkuPostfix());
-					
+
 					cc.setLastActive(new Date());
 					cc.update();
-					
+
 					HashMap<String, Object> map1 = new HashMap<>();
 					map1.put("CTPYE", "S");
 					map1.put("CustomerID", cc.getId().toString());
@@ -250,7 +250,7 @@ public class Application extends Controller {
 			}
 		} else {
 			if(fname == null || fname.isEmpty() ||
-					 lname == null || lname.isEmpty()){
+					lname == null || lname.isEmpty()){
 				map.put("status", "500");
 				map.put("message", "Please fill required data.");
 				map.put("data", null);
@@ -273,7 +273,7 @@ public class Application extends Controller {
 			}
 			c.setType("M");
 		}
-		
+
 		c.setFirstname(fname  +" "+  lname);
 		//c.setLastname(lname);
 		c.setEmail(email);
@@ -297,9 +297,9 @@ public class Application extends Controller {
 		c.setCreatedDate(d);
 		c.setUpdatedDate(d);
 		c.setQistSku("QCS");
-		
+
 		c.save();
-	
+
 		MultipartFormData body = request().body().asMultipartFormData();
 		if (body != null) {
 			FilePart filePart = body.getFile("image");
@@ -336,24 +336,24 @@ public class Application extends Controller {
 			try {
 				URL url = new URL(imageUrl);
 				String fileName = url.getFile();
-				
+
 				File cusFolder = new File(FILEPATH+"/customers/"+c.getId()+"/");
 				if(!cusFolder.exists()){
 					cusFolder.mkdir();
 				}
-				
+
 				String destName = FILEPATH+"/customers/"+c.getId()+"/"+fileName.substring(fileName.lastIndexOf("/")+1);
-				
+
 				InputStream is = url.openStream();
 				OutputStream os = new FileOutputStream(destName);
-			 
+
 				byte[] b = new byte[2048];
 				int length;
-			 
+
 				while ((length = is.read(b)) != -1) {
-						os.write(b, 0, length);
+					os.write(b, 0, length);
 				}
-				
+
 				is.close();
 				os.close();
 				imageDataString = fileName.substring(fileName.lastIndexOf("/")+1);
@@ -361,11 +361,11 @@ public class Application extends Controller {
 				e.printStackTrace();
 			}
 		}
-		
+
 		c.setImage(imageDataString);
 		c.setSkuPostfix((int)(long)c.getId());
 		c.update();
-		
+
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
 		vm.name = (c.getFirstname());
@@ -386,7 +386,7 @@ public class Application extends Controller {
 		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
-		
+
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("CTPYE", c.getType());
 		map1.put("CustomerID", c.getId().toString());
@@ -400,7 +400,7 @@ public class Application extends Controller {
 	public static Result login(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
-		
+
 		String email = data.path("email").asText();
 		String password = data.path("password").asText();
 		if(email.isEmpty() || email == null ||
@@ -423,10 +423,10 @@ public class Application extends Controller {
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}
-		
+
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
-	    vm.name = (c.getFirstname());
+		vm.name = (c.getFirstname());
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
@@ -444,10 +444,10 @@ public class Application extends Controller {
 		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
-	
+
 		c.setLastActive(new Date());
 		c.update();
-		
+
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("CTPYE", c.getType());
 		map1.put("CustomerID", c.getId().toString());
@@ -461,7 +461,7 @@ public class Application extends Controller {
 	public static Result forgotPassword(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
-		
+
 		String email = data.path("email").asText();
 		WdCustomer c = WdCustomer.findByEmail(email);
 		if(c == null){
@@ -479,11 +479,12 @@ public class Application extends Controller {
 		map.put("data", null);
 		return ok(Json.toJson(map));
 	}
-	
+
 	public static Result getCustomerProfile(){
 		HashMap<String, Object> map = new HashMap<>();
+		HashMap<String, Object> map1 = new HashMap<>();
 		JsonNode data = request().body().asJson();
-		
+
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id);
 		if(c == null){
@@ -498,7 +499,7 @@ public class Application extends Controller {
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
 		vm.password = c.getPassword();
-/*		vm.address = c.getAddress();*/
+		/*		vm.address = c.getAddress();*/
 		vm.address1 = c.getAddress1();
 		vm.address2 = c.getAddress2();
 		vm.city = c.getCity();
@@ -512,16 +513,20 @@ public class Application extends Controller {
 		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
+		map1.put("CTPYE", c.getType());
+		map1.put("CustomerID", c.getId().toString());
+		map1.put("UserData",vm);
 		map.put("status", "200");
 		map.put("message", "OK.");
-		map.put("data", vm);
+		map.put("data", map1);
 		return ok(Json.toJson(map));
 	}
-	
+
 	public static Result changeCustomerName(){
 		HashMap<String, Object> map = new HashMap<>();
+		HashMap<String, Object> map1 = new HashMap<>();
 		JsonNode data = request().body().asJson();
-	
+
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){
@@ -534,7 +539,7 @@ public class Application extends Controller {
 		//c.setLastname(data.path("lastName").asText());
 		c.setUpdatedDate(new Date());
 		c.update();
-		
+
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
 		vm.name = (c.getFirstname());
@@ -556,14 +561,19 @@ public class Application extends Controller {
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 		
+		map1.put("CTPYE", c.getType());
+		map1.put("CustomerID", c.getId().toString());
+		map1.put("UserData",vm);
+		
 		map.put("status", "200");
 		map.put("message", "OK.");
-		map.put("data", vm);
+		map.put("data", map1);
 		return ok(Json.toJson(map));
 	}
-	
+
 	public static Result changeCustomerPassword(){
 		HashMap<String, Object> map = new HashMap<>();
+		HashMap<String, Object> map1 = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
@@ -576,7 +586,7 @@ public class Application extends Controller {
 		c.setPassword(data.path("password").asText());
 		c.setUpdatedDate(new Date());
 		c.update();
-		
+
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
 		vm.name =(c.getFirstname());
@@ -597,16 +607,21 @@ public class Application extends Controller {
 		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
+
+		map1.put("CTPYE", c.getType());
+		map1.put("CustomerID", c.getId().toString());
+		map1.put("UserData",vm);
 		
 		map.put("status", "200");
 		map.put("message", "OK.");
-		map.put("data", vm);
+		map.put("data", map1);
 		return ok(Json.toJson(map));
 	}
-	
+
 	public static Result changeCustomerAddress(){
 		HashMap<String, Object> map = new HashMap<>();
-		
+		HashMap<String, Object> map1 = new HashMap<>();
+
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
@@ -624,7 +639,7 @@ public class Application extends Controller {
 		c.setZip(data.path("zip").asText());
 		c.setUpdatedDate(new Date());
 		c.update();
-		
+
 		CustomerVM vm = new CustomerVM();
 		vm.id = c.getId();
 		vm.name =(c.getFirstname());
@@ -645,31 +660,35 @@ public class Application extends Controller {
 		vm.lastActive = df.format(c.getLastActive());
 		vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
+
+		map1.put("CTPYE", c.getType());
+		map1.put("CustomerID", c.getId().toString());
+		map1.put("UserData",vm);
 		
 		map.put("status", "200");
 		map.put("message", "OK.");
-		map.put("data", vm);
+		map.put("data", map1);
 		return ok(Json.toJson(map));
 	}
-	
-	
+
+
 	public static Result getNews(){
 		HashMap<String,Object> map = new HashMap<>();
-		
+
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -7);
-        Date todate1 = cal.getTime();    
-        String fromdate = dateFormat.format(todate1);
-        
-        List<WdUser> user = WdUser.findBydate(fromdate);
-       
-        List<NewsVM> VMn = new ArrayList<NewsVM>();
-        for(WdUser s:user){
-        	System.out.println("User Id "+s.getId());
-        	NewsVM vmn = new NewsVM();
-        	WdRetailer w=WdRetailer.findByUser(s);
-        	RetailerVM vm = new RetailerVM();
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, -7);
+		Date todate1 = cal.getTime();    
+		String fromdate = dateFormat.format(todate1);
+
+		List<WdUser> user = WdUser.findBydate(fromdate);
+
+		List<NewsVM> VMn = new ArrayList<NewsVM>();
+		for(WdUser s:user){
+			System.out.println("User Id "+s.getId());
+			NewsVM vmn = new NewsVM();
+			WdRetailer w=WdRetailer.findByUser(s);
+			RetailerVM vm = new RetailerVM();
 			vm.setId(w.getId());
 			vm.setBusinessName(w.getBusinessName());
 			vm.setStreetName(w.getStreetName());
@@ -684,14 +703,14 @@ public class Application extends Controller {
 			vmn.news="New store \'"+w.getBusinessName()+"\' added.";
 			vmn.retailerData=vm;
 			VMn.add(vmn);
-        }
-        
-        List<WdProduct> product = WdProduct.findByProductDate(fromdate);
-        
-        for(WdProduct p : product)
-        {
-        	NewsVM vmn = new NewsVM();
-        	ProductVM vm = new ProductVM();
+		}
+
+		List<WdProduct> product = WdProduct.findByProductDate(fromdate);
+
+		for(WdProduct p : product)
+		{
+			NewsVM vmn = new NewsVM();
+			ProductVM vm = new ProductVM();
 			vm.id = p.getId();
 			vm.name = p.getName();
 			vm.description = p .getDescription();
@@ -712,20 +731,20 @@ public class Application extends Controller {
 				String url = PRODUCT_IMAGE + i.getProductImageName();
 				vm.images.add(url);
 			}
-			
+
 			vmn.news="New prouct \'"+p.getName()+"\' added in store \'"+p.getWdRetailer().getBusinessName()+"\'";
 			vmn.productData=vm;
 			VMn.add(vmn);
-        }
-        
-       
-        map.put("status", "200");
+		}
+
+
+		map.put("status", "200");
 		map.put("message", "OK.");
 		map.put("data", VMn);
 		return ok(Json.toJson(map));
 	}
-	
-	
+
+
 	public static Result sendPushNotification() {
 		HashMap<String,Object> map = new HashMap<>();
 		System.out.println("sendPushNotification " + lCertificate);
@@ -742,7 +761,7 @@ public class Application extends Controller {
 	}
 
 	private static final String AUTHORIZATION_KEY = "AIzaSyBLKOwfgUvHxVy6MxDS57XjXSnJWgwR_rI";
-	
+
 	//senderID = 495831502323
 
 	public static Result sendPushNotification1() {
@@ -760,8 +779,8 @@ public class Application extends Controller {
 		map.put("status", "200");
 		return ok(Json.toJson(map));
 	}
-	
-	public static Result getMyOffers() throws Exception{
+
+	/*public static Result getMyOffers() throws Exception{
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		String lat = data.path("lat").asText();
@@ -833,8 +852,68 @@ public class Application extends Controller {
 		map.put("message", "OK.");
 		map.put("data", map1);
 		return ok(Json.toJson(map));
+	}*/
+
+	public static Result getMyOffers() throws Exception{
+		HashMap<String, Object> map = new HashMap<>();
+		JsonNode data = request().body().asJson();
+		String lat = data.path("lat").asText();
+		String lon = data.path("lng").asText();
+		double lon1 = Double.parseDouble(lon);
+		double latn1 = Double.parseDouble(lat);
+		List<WdRetailer> wd = WdRetailer.findAll();
+		List<RetailerVM> vmList = new ArrayList<>();
+		for(WdRetailer w:wd){
+			String fullAddress = w.getStreetNo()+","+w.getStreetName()+","+w.getSuburb()+","+w.getCity();
+			String[] latLongs = getLatLongPositions(fullAddress);
+			double lon2 = Double.parseDouble(latLongs[1]);
+			double lat2 = Double.parseDouble(latLongs[0]);
+			double mydist = distance(latn1,lon1,lat2,lon2);
+			if(mydist <= dist ){
+				RetailerVM vm = new RetailerVM();
+				vm.setId(w.getId());
+				vm.setBusinessName(w.getBusinessName());
+				vm.setStreetName(w.getStreetName());
+				vm.setStreetNo(w.getStreetNo());
+				vm.setSuburb(w.getSuburb());
+				vm.setLogoImage(RETAILER_IMAGE + w.getLogoImage());
+				vm.setTradingName(w.getTradingName());
+				vm.setCity(w.getCity());
+				vm.setContactPerson(w.getContactPerson());
+				vm.setWorkEmail(w.getWorkEmail());
+				vm.setQistNo(w.getQistSku()+String.format("%07d", w.getSkuPostfix()));
+				vm.setProducts(getProducts(w.getId()));
+				vmList.add(vm);
+			}
+		}
+		String URL = "http://maps.googleapis.com/maps/api/geocode/json";
+		URL url = new URL(URL + "?latlng="
+				+ lat+","+lon + "&sensor=true");
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+		String output = "",full="";
+		output = br.readLine();
+		while (output != null) {
+			if(output.indexOf("formatted_address")>-1){
+				System.out.println(output);
+				full=output.substring(32);
+				if(full.indexOf(",")>-1)
+				{
+					full=full.substring(0,full.lastIndexOf(',')-1);
+				}
+				break;
+			}
+			output = br.readLine();  
+		}
+		HashMap<String, Object> map1 = new HashMap<>();
+		map1.put("retailers", vmList);
+		map1.put("location",full);
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", map1);
+		return ok(Json.toJson(map));
 	}
-	
+
 	private static List<ProductVM> getProducts(Long id) {
 		WdRetailer wd = WdRetailer.findById(id);
 		List<WdProduct> prod = WdProduct.findByRetailer(wd);
@@ -865,7 +944,7 @@ public class Application extends Controller {
 		}
 		return plist;
 	}
-	
+
 	public static Result getRetailerProducts() {
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
@@ -889,17 +968,16 @@ public class Application extends Controller {
 		vm.setContactPerson(w.getContactPerson());
 		vm.setWorkEmail(w.getWorkEmail());
 		vm.setQistNo(w.getQistSku()+String.format("%07d", w.getSkuPostfix()));
-		List<ProductVM> prods = getProducts(id);
+		vm.setProducts(getProducts(id));
 		HashMap<String, Object> map1 = new HashMap<>();
 		map1.put("retailer", vm);
-		map1.put("products", prods);
 		map.put("status", "200");
 		map.put("message", "OK.");
 		map.put("data", map1);
 		return ok(Json.toJson(map));
 	}
-	
-	
+
+
 	private static double distance(double lat1, double lon1, double lat2, double lon2) {
 		double theta = lon1 - lon2;
 		double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
@@ -969,60 +1047,62 @@ public class Application extends Controller {
 			return ok(Json.toJson(map));	
 		}else{
 			CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(c);
-				if(cs1!=null){
-					WdCustomerOrders o = new WdCustomerOrders();
-					o.setWdCustomer(cs1.getWdCustomer());
-					o.setWdRetailer(cs1.getWdRetailer());
-					if(cs1.getWdCustomer().getAddress1() != null){
-						o.setBillingAddress1(cs1.getWdCustomer().getAddress1());
-						o.setBillingAddress2(cs1.getWdCustomer().getAddress2());
-						o.setBillingCity(cs1.getWdCustomer().getCity());
-						o.setBillingState(cs1.getWdCustomer().getState());
-						o.setBillingCountry(cs1.getWdCustomer().getCountry());
-						o.setBillingZip(cs1.getWdCustomer().getZip());
-					} else {
-						o.setBillingAddress1(address1);
-						o.setBillingAddress2(address2);
-						o.setBillingCity(city);
-						o.setBillingState(state);
-						o.setBillingCountry(country);
-						o.setBillingZip(zip);
-					}
-					o.setShippingAddress1(address1);
-					o.setShippingAddress2(address2);
-					o.setShippingCity(city);
-					o.setShippingState(state);
-					o.setShippingCountry(country);
-					o.setShippingZip(zip);
-					o.setStatus("pending");
-					o.setCreatedDate(date);
-					o.setUpdatedDate(date);
-					o.save();
-					//create and save customer order with all details
-					for(SessionProduct p : cs1.getSessionProducts()){
-						if(p.getStatus().equals("Cart")){
-							//create and save customer order details for each session product in cart
-							WdCustomerOrderDetail od = new WdCustomerOrderDetail();
-							od.setWdCustomerOrder(o);
-							od.setProductId(p.getWdProduct().getId());
-							od.setCreatedDate(date);
-							od.setUpdatedDate(date);
-							od.setQuantity(1L);
-							od.setProductPrice(p.getWdProduct().getQistPrice());
-							od.save();
-							p.setStatus("None");
-							p.update();	
-						}
-					}
-					cs1.setEnd(date);
-					cs1.update();
+			if(cs1!=null){
+				WdCustomerOrders o = new WdCustomerOrders();
+				o.setWdCustomer(cs1.getWdCustomer());
+				o.setWdRetailer(cs1.getWdRetailer());
+				if(cs1.getWdCustomer().getAddress1() != null){
+					o.setBillingAddress1(cs1.getWdCustomer().getAddress1());
+					o.setBillingAddress2(cs1.getWdCustomer().getAddress2());
+					o.setBillingCity(cs1.getWdCustomer().getCity());
+					o.setBillingState(cs1.getWdCustomer().getState());
+					o.setBillingCountry(cs1.getWdCustomer().getCountry());
+					o.setBillingZip(cs1.getWdCustomer().getZip());
+				} else {
+					o.setBillingAddress1(address1);
+					o.setBillingAddress2(address2);
+					o.setBillingCity(city);
+					o.setBillingState(state);
+					o.setBillingCountry(country);
+					o.setBillingZip(zip);
 				}
+				o.setShippingAddress1(address1);
+				o.setShippingAddress2(address2);
+				o.setShippingCity(city);
+				o.setShippingState(state);
+				o.setShippingCountry(country);
+				o.setShippingZip(zip);
+				o.setStatus("pending");
+				o.setCreatedDate(date);
+				o.setUpdatedDate(date);
+				o.setSession(cs1);
+				o.save();
+				//create and save customer order with all details
+				for(SessionProduct p : cs1.getSessionProducts()){
+					if(p.getStatus().equals("Cart")){
+						//create and save customer order details for each session product in cart
+						WdCustomerOrderDetail od = new WdCustomerOrderDetail();
+						od.setWdCustomerOrder(o);
+						od.setProductId(p.getWdProduct().getId());
+						od.setCreatedDate(date);
+						od.setUpdatedDate(date);
+						od.setQuantity(1L);
+						od.setProductPrice(p.getWdProduct().getQistPrice());
+						od.save();
+						p.setStatus("Purchased");
+						p.update();	
+					}
+				}
+				cs1.setEnd(date);
+				cs1.update();
+			}
 		}
 		map.put("status","200");
-		map.put("message","ok");
+		map.put("message","OK.");
+		map.put("data",null);
 		return ok(Json.toJson(map));
 	}
-	
+
 
 	public static Result getCustomerCart(){
 		HashMap<String, Object> map = new HashMap<>();
@@ -1032,42 +1112,42 @@ public class Application extends Controller {
 		ArrayList<ProductVM> VMs =  new ArrayList<ProductVM>();
 		ArrayList<RetailerVM> VMr = new ArrayList<RetailerVM>();
 		Map<String , Object> map1 = new HashMap<>();
-		
+
 		if(c == null){
 			map.put("status", "500");
 			map.put("message", "User does not exist.");
 			map.put("data", null);
 			return ok(Json.toJson(map));
 		}else{
-			
+
 			CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(c);
-			
+
 			if(cs1 != null){
 				for(SessionProduct p:cs1.getSessionProducts()){
 					if(p.getStatus().equals("Cart"))
 					{
-					ProductVM vm = new ProductVM();
-					vm.id = p.getWdProduct().getId();
-					vm.name = p.getWdProduct().getName();
-					vm.description = p .getWdProduct().getDescription();
-					vm.status = p .getStatus();
-					vm.isApproved = Boolean.parseBoolean(p.getWdProduct().getIsApproved());
-					vm.mfrSku = p.getWdProduct().getMfrSku();
-					vm.storeSku = p.getWdProduct().getStoreSku();
-					vm.qistNo = p.getWdProduct().getQistSku() + String.format("%07d", p.getWdProduct().getSkuPostfix());
-					vm.qistPrice = p.getWdProduct().getQistPrice();
-					if(p.getWdProduct().getApprovedDate() != null){
-						vm.approvedDate = df.format(p.getWdProduct().getApprovedDate());
-					}
-					vm.createdDate = df.format(p.getWdProduct().getCreatedDate());
-					vm.updatedDate = df.format(p.getWdProduct().getUpdatedDate());
-					vm.validFromDate = df.format(p.getWdProduct().getValidFromDate());
-					vm.validToDate = df.format(p.getWdProduct().getValidToDate());
-					for(WdProductImage i:p.getWdProduct().getProductImages()){
-						String url = PRODUCT_IMAGE + i.getProductImageName();
-						vm.images.add(url);
-					}
-					VMs.add(vm);
+						ProductVM vm = new ProductVM();
+						vm.id = p.getWdProduct().getId();
+						vm.name = p.getWdProduct().getName();
+						vm.description = p .getWdProduct().getDescription();
+						vm.status = p .getStatus();
+						vm.isApproved = Boolean.parseBoolean(p.getWdProduct().getIsApproved());
+						vm.mfrSku = p.getWdProduct().getMfrSku();
+						vm.storeSku = p.getWdProduct().getStoreSku();
+						vm.qistNo = p.getWdProduct().getQistSku() + String.format("%07d", p.getWdProduct().getSkuPostfix());
+						vm.qistPrice = p.getWdProduct().getQistPrice();
+						if(p.getWdProduct().getApprovedDate() != null){
+							vm.approvedDate = df.format(p.getWdProduct().getApprovedDate());
+						}
+						vm.createdDate = df.format(p.getWdProduct().getCreatedDate());
+						vm.updatedDate = df.format(p.getWdProduct().getUpdatedDate());
+						vm.validFromDate = df.format(p.getWdProduct().getValidFromDate());
+						vm.validToDate = df.format(p.getWdProduct().getValidToDate());
+						for(WdProductImage i:p.getWdProduct().getProductImages()){
+							String url = PRODUCT_IMAGE + i.getProductImageName();
+							vm.images.add(url);
+						}
+						VMs.add(vm);
 					}
 				}
 				map1.put("products",VMs);
@@ -1084,8 +1164,8 @@ public class Application extends Controller {
 				rvm.setContactPerson(r.getContactPerson());
 				rvm.setWorkEmail(r.getWorkEmail());
 				rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
-                VMr.add(rvm);
-               map1.put("store",rvm);
+				VMr.add(rvm);
+				map1.put("store",rvm);
 			}
 		}
 		map.put("status", "200");
@@ -1093,11 +1173,11 @@ public class Application extends Controller {
 		map.put("data", map1);
 		return ok(Json.toJson(map));
 	}
-	
+
 	public static String timecal(String databasetime){
 		Date d = new Date();
 		Date d1=null;
-        try {
+		try {
 			d1=df1.parse(databasetime);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -1109,14 +1189,13 @@ public class Application extends Controller {
 		long min=(diffHours *60)+diffMinutes;
 		return (min+"");
 	}
-	
+
 	public static Result getCustomerWishlist(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
 		Long id = data.path("userId").asLong();
 		WdCustomer c = WdCustomer.findById(id); 
 
-		ArrayList<RetailerVM> VMr = new ArrayList<RetailerVM>();
 		ArrayList<CustomerSessionVM> VMcs = new ArrayList<CustomerSessionVM>();
 		ArrayList<CategoriesVM> VMc = new ArrayList<CategoriesVM>();
 		Map<String , Object> map1 = new HashMap<>();
@@ -1168,7 +1247,6 @@ public class Application extends Controller {
 					}
 					if(VMs.size()>0)
 					{
-						csvm.products = VMs;
 						//map1.put("products",VMs);
 						WdRetailer r = cs.getWdRetailer();
 						RetailerVM rvm = new RetailerVM();
@@ -1183,7 +1261,7 @@ public class Application extends Controller {
 						rvm.setContactPerson(r.getContactPerson());
 						rvm.setWorkEmail(r.getWorkEmail());
 						rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
-						VMr.add(rvm);
+						rvm.setProducts(VMs);
 						//map1.put("store",rvm);
 						csvm.retailerVM = rvm;
 						VMcs.add(csvm);
@@ -1211,7 +1289,7 @@ public class Application extends Controller {
 		return ok(Json.toJson(map));
 	}
 
-	
+
 	public static Result addToCart() throws ParseException{
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
@@ -1243,15 +1321,15 @@ public class Application extends Controller {
 		{
 			if(cs1.getWdRetailer().getId() == p.getWdRetailer().getId()){
 				for(SessionProduct sp1 : cs1.getSessionProducts())
-        		{
-        			if(sp1.getWdProduct().getId()==p.getId())
-        			{
-        				map.put("status", "500");
-        				map.put("message", "Already added in cart.");
-        				map.put("data", null);
-        				return ok(Json.toJson(map));
-        			}
-        		}
+				{
+					if(sp1.getWdProduct().getId()==p.getId())
+					{
+						map.put("status", "500");
+						map.put("message", "Already added in cart.");
+						map.put("data", null);
+						return ok(Json.toJson(map));
+					}
+				}
 				SessionProduct sp  = new  SessionProduct() ;
 				sp.setWdProduct(p);
 				/*sp.setPurchased(false);*/
@@ -1341,7 +1419,7 @@ public class Application extends Controller {
 		map.put("data", res);
 		return ok(Json.toJson(map));
 	}
-	
+
 
 
 	public static Result scanProduct() throws ParseException{
@@ -1383,9 +1461,9 @@ public class Application extends Controller {
 				String url = PRODUCT_IMAGE + i.getProductImageName();
 				vm.images.add(url);
 			}
-			
+
 			res.put("product", vm);
-			
+
 			WdRetailer r = p.getWdRetailer();
 			RetailerVM rvm = new RetailerVM();
 			rvm.setId(r.getId());
@@ -1417,63 +1495,63 @@ public class Application extends Controller {
 		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 		String date = DATE_FORMAT.format(today);
 
-        CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(w);
-        System.out.println(cs1);
-        if(cs1 != null)
-        {
-        	if(cs1.getWdRetailer().getId() == p.getWdRetailer().getId()){
-        		for(SessionProduct sp1 : cs1.getSessionProducts())
-        		{
-        			if(sp1.getWdProduct().getId()==p.getId())
-        			{
-        				map.put("status", "500");
-        				map.put("message", "Already added in cart.");
-        				map.put("data", null);
-        				return ok(Json.toJson(map));
-        			}
-        		}
-        		SessionProduct sp  = new  SessionProduct() ;
-        		sp.setWdProduct(p);
-        		/*sp.setPurchased(false);*/
-        		sp.setCustomerSession(cs1);
-        		sp.setStatus("Cart");
-        		sp.save();
-        		
-        	}else{
-        		for(SessionProduct sp:cs1.getSessionProducts()){
-        			sp.setStatus("Wishlist");
-        			sp.update();
-        		}
-        		cs1.setEnd(today);
-        		cs1.update();
-        		cs1 = new CustomerSession();
-    			cs1.setWdRetailer(p.getWdRetailer());
-    			cs1.setWdCustomer(w);
-    			cs1.setStart(today);
-    			cs1.save();
-    			SessionProduct sp  = new  SessionProduct() ;
-        		sp.setWdProduct(p);
-        	/*	sp.setPurchased(false);*/
-        		sp.setCustomerSession(cs1);
-        		sp.setStatus("Cart");
-        		sp.save();
-        		
-        	}
-        }else{
-        	cs1 = new CustomerSession();
+		CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(w);
+		System.out.println(cs1);
+		if(cs1 != null)
+		{
+			if(cs1.getWdRetailer().getId() == p.getWdRetailer().getId()){
+				for(SessionProduct sp1 : cs1.getSessionProducts())
+				{
+					if(sp1.getWdProduct().getId()==p.getId())
+					{
+						map.put("status", "500");
+						map.put("message", "Already added in cart.");
+						map.put("data", null);
+						return ok(Json.toJson(map));
+					}
+				}
+				SessionProduct sp  = new  SessionProduct() ;
+				sp.setWdProduct(p);
+				/*sp.setPurchased(false);*/
+				sp.setCustomerSession(cs1);
+				sp.setStatus("Cart");
+				sp.save();
+
+			}else{
+				for(SessionProduct sp:cs1.getSessionProducts()){
+					sp.setStatus("Wishlist");
+					sp.update();
+				}
+				cs1.setEnd(today);
+				cs1.update();
+				cs1 = new CustomerSession();
+				cs1.setWdRetailer(p.getWdRetailer());
+				cs1.setWdCustomer(w);
+				cs1.setStart(today);
+				cs1.save();
+				SessionProduct sp  = new  SessionProduct() ;
+				sp.setWdProduct(p);
+				/*	sp.setPurchased(false);*/
+				sp.setCustomerSession(cs1);
+				sp.setStatus("Cart");
+				sp.save();
+
+			}
+		}else{
+			cs1 = new CustomerSession();
 			cs1.setWdRetailer(p.getWdRetailer());
 			cs1.setWdCustomer(w);
 			cs1.setStart(today);
 			cs1.save();
 			SessionProduct sp  = new  SessionProduct() ;
-    		sp.setWdProduct(p);
-    		/*sp.setPurchased(false);*/
-    		sp.setCustomerSession(cs1);
-    		sp.setStatus("Cart");
-    		sp.save();
-        	
-        }
-        
+			sp.setWdProduct(p);
+			/*sp.setPurchased(false);*/
+			sp.setCustomerSession(cs1);
+			sp.setStatus("Cart");
+			sp.save();
+
+		}
+
 		ProductVM vm = new ProductVM();
 		vm.id = p.getId();
 		vm.name = p.getName();
@@ -1495,9 +1573,9 @@ public class Application extends Controller {
 			String url = PRODUCT_IMAGE + i.getProductImageName();
 			vm.images.add(url);
 		}
-		
+
 		res.put("product", vm);
-		
+
 		WdRetailer r = p.getWdRetailer();
 		RetailerVM rvm = new RetailerVM();
 		rvm.setId(r.getId());
@@ -1513,7 +1591,7 @@ public class Application extends Controller {
 		rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
 
 		res.put("store", rvm);
-		
+
 		map.put("status", "200");
 		map.put("message", "OK.");
 		map.put("data", res);
@@ -1523,7 +1601,7 @@ public class Application extends Controller {
 	public static Result getRecentlyVisitedStores(){
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
-		
+
 		Long userId = data.path("userId").asLong();
 		ArrayList<CustomerSessionVM> customerSessionVMs = new ArrayList<CustomerSessionVM>();
 		WdCustomer w = WdCustomer.findById(userId);
@@ -1538,73 +1616,75 @@ public class Application extends Controller {
 			for(CustomerSession c :  cs){
 				CustomerSessionVM customerSession = new CustomerSessionVM();
 				customerSession.id = c.getId();
-				
-				WdRetailer r =  c.getWdRetailer();
-                RetailerVM rvm = new RetailerVM();
-                rvm.setId(r.getId());
-                rvm.setBillingInformation(r.getBillingInformation());
-                rvm.setBusinessName(r.getBusinessName());
-                rvm.setCity(r.getCity());
-                rvm.setContactPerson(r.getContactPerson());
-                rvm.setEftpos(r.getEftpos());
-                rvm.setEftposProvider(r.getEftposProvider());
-                rvm.setFbLink(r.getFbLink());
-                rvm.setGoodsCategories(r.getGoodsCategories());
-                rvm.setGoogleLink(r.getGoogleLink());
-                rvm.setGstNo(r.getGstNo());
-                rvm.setIrNo(r.getIrNo());
-                rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
-                rvm.setMerchantId(r.getMerchantId());
-                rvm.setMobileNo(r.getMobileNo());
-                rvm.setPaymark(r.getPaymark());
-                rvm.setQistSku(r.getQistSku());
-                rvm.setReferedBy(r.getReferedBy());
-                rvm.setSkuPostfix(r.getSkuPostfix());
-                rvm.setStreetName(r.getStreetName());
-                rvm.setStreetNo(r.getStreetNo());
-                rvm.setSuburb(r.getSuburb());
-                rvm.setTitle(r.getTitle());
-                rvm.setTradingName(r.getTradingName());
-                rvm.setTwitterLink(r.getTwitterLink());
-                rvm.setWorkEmail(r.getWorkEmail());
-                rvm.setWorkPhone1(r.getWorkPhone1());
-                rvm.setWorkPhone2(r.getWorkPhone2());
-                rvm.setWorkUrl(r.getWorkUrl());
-                rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
 
-                customerSession.retailerVM = rvm;
+				WdRetailer r =  c.getWdRetailer();
+				RetailerVM rvm = new RetailerVM();
+				rvm.setId(r.getId());
+				rvm.setBillingInformation(r.getBillingInformation());
+				rvm.setBusinessName(r.getBusinessName());
+				rvm.setCity(r.getCity());
+				rvm.setContactPerson(r.getContactPerson());
+				rvm.setEftpos(r.getEftpos());
+				rvm.setEftposProvider(r.getEftposProvider());
+				rvm.setFbLink(r.getFbLink());
+				rvm.setGoodsCategories(r.getGoodsCategories());
+				rvm.setGoogleLink(r.getGoogleLink());
+				rvm.setGstNo(r.getGstNo());
+				rvm.setIrNo(r.getIrNo());
+				rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
+				rvm.setMerchantId(r.getMerchantId());
+				rvm.setMobileNo(r.getMobileNo());
+				rvm.setPaymark(r.getPaymark());
+				rvm.setQistSku(r.getQistSku());
+				rvm.setReferedBy(r.getReferedBy());
+				rvm.setSkuPostfix(r.getSkuPostfix());
+				rvm.setStreetName(r.getStreetName());
+				rvm.setStreetNo(r.getStreetNo());
+				rvm.setSuburb(r.getSuburb());
+				rvm.setTitle(r.getTitle());
+				rvm.setTradingName(r.getTradingName());
+				rvm.setTwitterLink(r.getTwitterLink());
+				rvm.setWorkEmail(r.getWorkEmail());
+				rvm.setWorkPhone1(r.getWorkPhone1());
+				rvm.setWorkPhone2(r.getWorkPhone2());
+				rvm.setWorkUrl(r.getWorkUrl());
+				rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
+
 				customerSession.start = df1.format(c.getStart());
 				if(c.getEnd()!=null)
 				{
-				customerSession.end = df1.format(c.getEnd());
-				customerSession.beforeTime=timecal(customerSession.end);
+					customerSession.end = df1.format(c.getEnd());
+					customerSession.beforeTime=timecal(customerSession.end);
 				}
-				
+
 				List<SessionProduct> products = c.getSessionProducts();
+				List<ProductVM> prods = new ArrayList<>();
 				for(SessionProduct s: products){
-						ProductVM pvm = new ProductVM();
-						pvm.id = s.getWdProduct().getId();
-						pvm.description = s.getWdProduct().getDescription();
-						pvm.isApproved =Boolean.parseBoolean(s.getWdProduct().getIsApproved());
-						pvm.mfrSku = s.getWdProduct().getMfrSku();
-						pvm.name = s.getWdProduct().getName();
-						pvm.qistNo = s.getWdProduct().getQistSku()+String.format("%07d", s.getWdProduct().getSkuPostfix());
-						pvm.status = s.getWdProduct().getStatus();
-						pvm.storeSku = s.getWdProduct().getStoreSku();
-						pvm.qistPrice = s.getWdProduct().getQistPrice();
-						if(s.getWdProduct().getApprovedDate() != null){
-							pvm.approvedDate = df.format(s.getWdProduct().getApprovedDate());
-						}
-						pvm.createdDate = df.format(s.getWdProduct().getCreatedDate());
-						pvm.updatedDate = df.format(s.getWdProduct().getUpdatedDate());
-						pvm.validFromDate = df.format(s.getWdProduct().getValidFromDate());
-						pvm.validToDate = df.format(s.getWdProduct().getValidToDate());
-						for(WdProductImage i:s.getWdProduct().getProductImages()){
-							String url = PRODUCT_IMAGE + i.getProductImageName();
-							pvm.images.add(url);
-						}
-						customerSession.products.add(pvm);	
+					ProductVM pvm = new ProductVM();
+					pvm.id = s.getWdProduct().getId();
+					pvm.description = s.getWdProduct().getDescription();
+					pvm.isApproved =Boolean.parseBoolean(s.getWdProduct().getIsApproved());
+					pvm.mfrSku = s.getWdProduct().getMfrSku();
+					pvm.name = s.getWdProduct().getName();
+					pvm.qistNo = s.getWdProduct().getQistSku()+String.format("%07d", s.getWdProduct().getSkuPostfix());
+					pvm.status = s.getWdProduct().getStatus();
+					pvm.storeSku = s.getWdProduct().getStoreSku();
+					pvm.qistPrice = s.getWdProduct().getQistPrice();
+					if(s.getWdProduct().getApprovedDate() != null){
+						pvm.approvedDate = df.format(s.getWdProduct().getApprovedDate());
+					}
+					pvm.createdDate = df.format(s.getWdProduct().getCreatedDate());
+					pvm.updatedDate = df.format(s.getWdProduct().getUpdatedDate());
+					pvm.validFromDate = df.format(s.getWdProduct().getValidFromDate());
+					pvm.validToDate = df.format(s.getWdProduct().getValidToDate());
+					for(WdProductImage i:s.getWdProduct().getProductImages()){
+						String url = PRODUCT_IMAGE + i.getProductImageName();
+						pvm.images.add(url);
+					}
+					prods.add(pvm);	
 				}
+				rvm.setProducts(prods);
+				customerSession.retailerVM = rvm;
 				customerSessionVMs.add(customerSession);
 			}	
 			map.put("status", "200");
@@ -1630,7 +1710,7 @@ public class Application extends Controller {
 			List<WdCustomerOrders> wco = WdCustomerOrders.findById(w);
 			for(WdCustomerOrders o :wco){
 				CustomerOrderVM co = new CustomerOrderVM();
-				
+
 				RetailerVM rvm = new RetailerVM();
 				rvm.setId(o.getWdRetailer().getId());
 				rvm.setBillingInformation(o.getWdRetailer().getBillingInformation());
@@ -1663,9 +1743,8 @@ public class Application extends Controller {
 				rvm.setWorkUrl(o.getWdRetailer().getWorkUrl());
 				rvm.setQistNo(o.getWdRetailer().getQistSku()+String.format("%07d", o.getWdRetailer().getSkuPostfix()));
 
-				co.retailer=rvm;
-
 				List<WdCustomerOrderDetail> wcod = WdCustomerOrderDetail.findByOrderId(o);
+				List<ProductVM> prods = new ArrayList<>();
 				for(WdCustomerOrderDetail od : wcod){
 					WdProduct p = WdProduct.findByProductId(od.getProductId());
 
@@ -1690,11 +1769,12 @@ public class Application extends Controller {
 						String url = PRODUCT_IMAGE + i.getProductImageName();
 						pvm.images.add(url);
 					}
-
-					co.product.add(pvm);
+					prods.add(pvm);
 				}
-                co.createDate=df1.format(o.getCreatedDate());
-                co.beforeTime=timecal(co.createDate);
+				rvm.setProducts(prods);
+				co.retailer = rvm;
+				co.createDate = df1.format(o.getCreatedDate());
+				co.beforeTime = timecal(co.createDate);
 				VMc.add(co);
 			}
 		}
@@ -1704,7 +1784,7 @@ public class Application extends Controller {
 		map.put("data",VMc);
 		return ok(Json.toJson(map));
 	} 
-	
+
 	public static void sendPasswordMail(String email,String pass) {
 		final String username = "mindnervesdemo@gmail.com";
 		final String password = "mindnervesadmin";
@@ -1740,14 +1820,14 @@ public class Application extends Controller {
 			e.printStackTrace();
 		} 
 	} 
-	
+
 	public static Result  changeCustomerProfileImage() throws IOException{
 		HashMap<String, Object> map = new HashMap<>();
 		DynamicForm users = Form.form().bindFromRequest();
 
 		Long id = Long.parseLong(users.get("userId"));
 		WdCustomer c = WdCustomer.findById(id); 
-	
+
 		String imageDataString = new String();
 		if(c != null){
 			MultipartFormData body = request().body().asMultipartFormData();
@@ -1805,7 +1885,7 @@ public class Application extends Controller {
 			vm.lastActive = df.format(c.getLastActive());
 			vm.qCartMailingList = Boolean.parseBoolean(c.getQCartMailingList());
 			vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
-			
+
 			HashMap<String, Object> map1 = new HashMap<>();
 			map1.put("CTPYE", c.getType());
 			map1.put("CustomerID", c.getId().toString());
@@ -1821,8 +1901,8 @@ public class Application extends Controller {
 			return ok(Json.toJson(map));
 		}
 	}
-	
-	
+
+
 	public static Result getCustomerProfileImage(Long id) throws IOException{
 		WdCustomer c = WdCustomer.findById(id); 
 		if(c == null){

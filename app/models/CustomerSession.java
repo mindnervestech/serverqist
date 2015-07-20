@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import play.db.ebean.Model;
@@ -36,6 +37,9 @@ public class CustomerSession extends Model{
 	
 	@OneToMany(mappedBy="customerSession")
 	public List<SessionProduct> sessionProducts;
+	
+	@OneToOne(mappedBy = "session")
+	public WdCustomerOrders order;
 
 	public Long getId() {
 		return id;
@@ -79,6 +83,14 @@ public class CustomerSession extends Model{
 
 	public List<SessionProduct> getSessionProducts() {
 		return sessionProducts;
+	}
+
+	public WdCustomerOrders getOrder() {
+		return order;
+	}
+
+	public void setOrder(WdCustomerOrders order) {
+		this.order = order;
 	}
 
 	public void setSessionProducts(List<SessionProduct> sessionProducts) {
