@@ -866,24 +866,26 @@ public class Application extends Controller {
 		for(WdRetailer w:wd){
 			String fullAddress = w.getStreetNo()+","+w.getStreetName()+","+w.getSuburb()+","+w.getCity();
 			String[] latLongs = getLatLongPositions(fullAddress);
-			double lon2 = Double.parseDouble(latLongs[1]);
-			double lat2 = Double.parseDouble(latLongs[0]);
-			double mydist = distance(latn1,lon1,lat2,lon2);
-			if(mydist <= dist ){
-				RetailerVM vm = new RetailerVM();
-				vm.setId(w.getId());
-				vm.setBusinessName(w.getBusinessName());
-				vm.setStreetName(w.getStreetName());
-				vm.setStreetNo(w.getStreetNo());
-				vm.setSuburb(w.getSuburb());
-				vm.setLogoImage(RETAILER_IMAGE + w.getLogoImage());
-				vm.setTradingName(w.getTradingName());
-				vm.setCity(w.getCity());
-				vm.setContactPerson(w.getContactPerson());
-				vm.setWorkEmail(w.getWorkEmail());
-				vm.setQistNo(w.getQistSku()+String.format("%07d", w.getSkuPostfix()));
-				vm.setProducts(getProducts(w.getId()));
-				vmList.add(vm);
+			if(latLongs != null){
+				double lon2 = Double.parseDouble(latLongs[1]);
+				double lat2 = Double.parseDouble(latLongs[0]);
+				double mydist = distance(latn1,lon1,lat2,lon2);
+				if(mydist <= dist ){
+					RetailerVM vm = new RetailerVM();
+					vm.setId(w.getId());
+					vm.setBusinessName(w.getBusinessName());
+					vm.setStreetName(w.getStreetName());
+					vm.setStreetNo(w.getStreetNo());
+					vm.setSuburb(w.getSuburb());
+					vm.setLogoImage(RETAILER_IMAGE + w.getLogoImage());
+					vm.setTradingName(w.getTradingName());
+					vm.setCity(w.getCity());
+					vm.setContactPerson(w.getContactPerson());
+					vm.setWorkEmail(w.getWorkEmail());
+					vm.setQistNo(w.getQistSku()+String.format("%07d", w.getSkuPostfix()));
+					vm.setProducts(getProducts(w.getId()));
+					vmList.add(vm);
+				}
 			}
 		}
 		String URL = "http://maps.googleapis.com/maps/api/geocode/json";
@@ -1022,7 +1024,7 @@ public class Application extends Controller {
 			}
 			else
 			{
-				throw new Exception("Error from the API - response status: "+status);
+				//throw new Exception("Error from the API - response status: "+status);
 			}
 		}
 		return null;
@@ -1123,6 +1125,7 @@ public class Application extends Controller {
 			CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(c);
 
 			if(cs1 != null){
+				CustomerSessionVM cvm = new CustomerSessionVM();
 				for(SessionProduct p:cs1.getSessionProducts()){
 					if(p.getStatus().equals("Cart"))
 					{
@@ -1150,7 +1153,6 @@ public class Application extends Controller {
 						VMs.add(vm);
 					}
 				}
-				map1.put("products",VMs);
 				WdRetailer r = cs1.getWdRetailer();
 				RetailerVM rvm = new RetailerVM();
 				rvm.setId(r.getId());
@@ -1164,13 +1166,18 @@ public class Application extends Controller {
 				rvm.setContactPerson(r.getContactPerson());
 				rvm.setWorkEmail(r.getWorkEmail());
 				rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
-				VMr.add(rvm);
-				map1.put("store",rvm);
+				rvm.setProducts(VMs);
+				cvm.retailerVM = rvm;
+				cvm.start = df1.format(cs1.getStart());
+				map.put("status", "200");
+				map.put("message", "OK.");
+				map.put("data", cvm);
+			} else {
+				map.put("status","200");
+				map.put("message","OK.");
+				map.put("data",null);
 			}
 		}
-		map.put("status", "200");
-		map.put("message", "OK.");
-		map.put("data", map1);
 		return ok(Json.toJson(map));
 	}
 
