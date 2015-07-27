@@ -1434,10 +1434,11 @@ public class Application extends Controller {
 		JsonNode data = request().body().asJson();
 		Long userId = data.path("userId").asLong();
 		String qrcode = data.path("qrCode").asText();
+		String showpopup="NO";
 
 		WdCustomer w = WdCustomer.findById(userId);
 		WdProduct p = WdProduct.findByQistSkuAndSkuPostfix(qrcode);
-
+      
 		Map<String, Object> res = new HashMap<>();
 
 		if(w == null){
@@ -1501,36 +1502,55 @@ public class Application extends Controller {
 		Date today = new Date();
 		SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 		String date = DATE_FORMAT.format(today);
-
-		CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(w);
-		System.out.println(cs1);
-		if(cs1 != null)
-		{
-			if(cs1.getWdRetailer().getId() == p.getWdRetailer().getId()){
-				for(SessionProduct sp1 : cs1.getSessionProducts())
-				{
-					if(sp1.getWdProduct().getId()==p.getId())
+		
+		List<CustomerSession> d = CustomerSession.getRetailerCustomerSession(p.getWdRetailer(),w);
+		
+		if(d!=null){
+		for(CustomerSession d1:d){
+			CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(w);
+			System.out.println(cs1);
+			if(cs1 != null)
+			{
+			   if(cs1.getWdRetailer().getId() == p.getWdRetailer().getId()){
+					for(SessionProduct sp1 : cs1.getSessionProducts())
 					{
-						map.put("status", "500");
-						map.put("message", "Already added in cart.");
-						map.put("data", null);
-						return ok(Json.toJson(map));
+						if(sp1.getWdProduct().getId()==p.getId())
+						{
+							map.put("status", "500");
+							map.put("message", "Already added in cart.");
+							map.put("data", null);
+							return ok(Json.toJson(map));
+						}
 					}
-				}
-				SessionProduct sp  = new  SessionProduct() ;
-				sp.setWdProduct(p);
-				/*sp.setPurchased(false);*/
-				sp.setCustomerSession(cs1);
-				sp.setStatus("Cart");
-				sp.save();
+					SessionProduct sp  = new  SessionProduct() ;
+					sp.setWdProduct(p);
+					
+				//	sp.setPurchased(false);
+					sp.setCustomerSession(cs1);
+					sp.setStatus("Cart");
+					sp.save();
 
-			}else{
-				for(SessionProduct sp:cs1.getSessionProducts()){
-					sp.setStatus("Wishlist");
-					sp.update();
+				}else{
+					for(SessionProduct sp:cs1.getSessionProducts()){
+						sp.setStatus("Wishlist");
+						sp.update();
+					}
+					cs1.setEnd(today);
+					cs1.update();
+					cs1 = new CustomerSession();
+					cs1.setWdRetailer(p.getWdRetailer());
+					cs1.setWdCustomer(w);
+					cs1.setStart(today);
+					cs1.save();
+					SessionProduct sp  = new  SessionProduct() ;
+					sp.setWdProduct(p);
+					//	sp.setPurchased(false);
+					sp.setCustomerSession(cs1);
+					sp.setStatus("Cart");
+					sp.save();
+
 				}
-				cs1.setEnd(today);
-				cs1.update();
+			}else{
 				cs1 = new CustomerSession();
 				cs1.setWdRetailer(p.getWdRetailer());
 				cs1.setWdCustomer(w);
@@ -1538,71 +1558,254 @@ public class Application extends Controller {
 				cs1.save();
 				SessionProduct sp  = new  SessionProduct() ;
 				sp.setWdProduct(p);
-				/*	sp.setPurchased(false);*/
+				//sp.setPurchased(false);
 				sp.setCustomerSession(cs1);
 				sp.setStatus("Cart");
 				sp.save();
 
 			}
-		}else{
-			cs1 = new CustomerSession();
-			cs1.setWdRetailer(p.getWdRetailer());
-			cs1.setWdCustomer(w);
-			cs1.setStart(today);
-			cs1.save();
-			SessionProduct sp  = new  SessionProduct() ;
-			sp.setWdProduct(p);
-			/*sp.setPurchased(false);*/
-			sp.setCustomerSession(cs1);
-			sp.setStatus("Cart");
-			sp.save();
 
+			ProductVM vm = new ProductVM();
+			vm.id = p.getId();
+			vm.name = p.getName();
+			vm.description = p .getDescription();
+			vm.status = p .getStatus();
+			vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
+			vm.mfrSku = p.getMfrSku();
+			vm.storeSku = p.getStoreSku();
+			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
+			vm.qistPrice = p.getQistPrice();
+			if(p.getApprovedDate() != null){
+				vm.approvedDate = df.format(p.getApprovedDate());
+			}
+			vm.createdDate = df.format(p.getCreatedDate());
+			vm.updatedDate = df.format(p.getUpdatedDate());
+			vm.validFromDate = df.format(p.getValidFromDate());
+			vm.validToDate = df.format(p.getValidToDate());
+			for(WdProductImage i:p.getProductImages()){
+				String url = PRODUCT_IMAGE + i.getProductImageName();
+				vm.images.add(url);
+			}
+
+			res.put("product", vm);
+
+			WdRetailer r = p.getWdRetailer();
+			RetailerVM rvm = new RetailerVM();
+			rvm.setId(r.getId());
+			rvm.setBusinessName(r.getBusinessName());
+			rvm.setStreetName(r.getStreetName());
+			rvm.setStreetNo(r.getStreetNo());
+			rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
+			rvm.setSuburb(r.getSuburb());
+			rvm.setTradingName(r.getTradingName());
+			rvm.setCity(r.getCity());
+			rvm.setContactPerson(r.getContactPerson());
+			rvm.setWorkEmail(r.getWorkEmail());
+			rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
+
+			res.put("store", rvm);
+			
+			res.put("showpopup",showpopup);
+			
+
+			map.put("status", "200");
+			map.put("message", "OK.");
+			map.put("data", res);
+			return ok(Json.toJson(map));
+					
+			}
 		}
+			showpopup="YES";
+			
+			res.put("showpopup",showpopup);
+			res.put("product",null);
+			res.put("store",null);
+			map.put("status", "200");
+			map.put("message", "OK.");
+			map.put("data", res);
+			return ok(Json.toJson(map));
+		
+	}
+	
+	public static Result getOrder(){
+		HashMap<String, Object> map = new HashMap<>();
+		JsonNode data = request().body().asJson();
+		String popStatus = data.path("popStatus").asText();
+		if(popStatus.equals("YES")){
+			Long userId = data.path("userId").asLong();
+			String qrcode = data.path("qrCode").asText();
+			WdCustomer w = WdCustomer.findById(userId);
+			WdProduct p = WdProduct.findByQistSkuAndSkuPostfix(qrcode);
+	      
+			Map<String, Object> res = new HashMap<>();
 
-		ProductVM vm = new ProductVM();
-		vm.id = p.getId();
-		vm.name = p.getName();
-		vm.description = p .getDescription();
-		vm.status = p .getStatus();
-		vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
-		vm.mfrSku = p.getMfrSku();
-		vm.storeSku = p.getStoreSku();
-		vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
-		vm.qistPrice = p.getQistPrice();
-		if(p.getApprovedDate() != null){
-			vm.approvedDate = df.format(p.getApprovedDate());
+			if(w == null){
+				if(p == null){
+					map.put("status", "500");
+					map.put("message", "Product not found.");
+					map.put("data", null);
+					return ok(Json.toJson(map));
+				}
+				ProductVM vm = new ProductVM();
+				vm.id = p.getId();
+				vm.name = p.getName();
+				vm.description = p .getDescription();
+				vm.status = p .getStatus();
+				vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
+				vm.mfrSku = p.getMfrSku();
+				vm.storeSku = p.getStoreSku();
+				vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
+				vm.qistPrice = p.getQistPrice();
+				if(p.getApprovedDate() != null){
+					vm.approvedDate = df.format(p.getApprovedDate());
+				}
+				vm.createdDate = df.format(p.getCreatedDate());
+				vm.updatedDate = df.format(p.getUpdatedDate());
+				vm.validFromDate = df.format(p.getValidFromDate());
+				vm.validToDate = df.format(p.getValidToDate());
+				for(WdProductImage i:p.getProductImages()){
+					String url = PRODUCT_IMAGE + i.getProductImageName();
+					vm.images.add(url);
+				}
+
+				res.put("product", vm);
+
+				WdRetailer r = p.getWdRetailer();
+				RetailerVM rvm = new RetailerVM();
+				rvm.setId(r.getId());
+				rvm.setBusinessName(r.getBusinessName());
+				rvm.setStreetName(r.getStreetName());
+				rvm.setStreetNo(r.getStreetNo());
+				rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
+				rvm.setSuburb(r.getSuburb());
+				rvm.setTradingName(r.getTradingName());
+				rvm.setCity(r.getCity());
+				rvm.setContactPerson(r.getContactPerson());
+				rvm.setWorkEmail(r.getWorkEmail());
+				rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
+
+				res.put("store", rvm);
+				map.put("status", "200");
+				map.put("message", "OK.");
+				map.put("data", res);
+				return ok(Json.toJson(map));
+			}
+			if(p == null){
+				map.put("status", "500");
+				map.put("message", "Product not found.");
+				map.put("data", null);
+				return ok(Json.toJson(map));
+			}
+
+			Date today = new Date();
+			SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+			String date = DATE_FORMAT.format(today);
+			
+			
+	         CustomerSession cs1 = CustomerSession.getCustomerSessionByActiveCustomerId(w);
+			System.out.println(cs1);
+			if(cs1 != null)
+			{
+			   if(cs1.getWdRetailer().getId() == p.getWdRetailer().getId()){
+					for(SessionProduct sp1 : cs1.getSessionProducts())
+					{
+						if(sp1.getWdProduct().getId()==p.getId())
+						{
+							map.put("status", "500");
+							map.put("message", "Already added in cart.");
+							map.put("data", null);
+							return ok(Json.toJson(map));
+						}
+					}
+					SessionProduct sp  = new  SessionProduct() ;
+					sp.setWdProduct(p);
+				//	sp.setPurchased(false);
+					sp.setCustomerSession(cs1);
+					sp.setStatus("Cart");
+					sp.save();
+
+				}else{
+					for(SessionProduct sp:cs1.getSessionProducts()){
+						sp.setStatus("Wishlist");
+						sp.update();
+					}
+					cs1.setEnd(today);
+					cs1.update();
+					cs1 = new CustomerSession();
+					cs1.setWdRetailer(p.getWdRetailer());
+					cs1.setWdCustomer(w);
+					cs1.setStart(today);
+					cs1.save();
+					SessionProduct sp  = new  SessionProduct() ;
+					sp.setWdProduct(p);
+					//	sp.setPurchased(false);
+					sp.setCustomerSession(cs1);
+					sp.setStatus("Cart");
+					sp.save();
+
+				}
+			}else{
+				cs1 = new CustomerSession();
+				cs1.setWdRetailer(p.getWdRetailer());
+				cs1.setWdCustomer(w);
+				cs1.setStart(today);
+				cs1.save();
+				SessionProduct sp  = new  SessionProduct() ;
+				sp.setWdProduct(p);
+				//sp.setPurchased(false);
+				sp.setCustomerSession(cs1);
+				sp.setStatus("Cart");
+				sp.save();
+
+			}
+
+			ProductVM vm = new ProductVM();
+			vm.id = p.getId();
+			vm.name = p.getName();
+			vm.description = p .getDescription();
+			vm.status = p .getStatus();
+			vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
+			vm.mfrSku = p.getMfrSku();
+			vm.storeSku = p.getStoreSku();
+			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
+			vm.qistPrice = p.getQistPrice();
+			if(p.getApprovedDate() != null){
+				vm.approvedDate = df.format(p.getApprovedDate());
+			}
+			vm.createdDate = df.format(p.getCreatedDate());
+			vm.updatedDate = df.format(p.getUpdatedDate());
+			vm.validFromDate = df.format(p.getValidFromDate());
+			vm.validToDate = df.format(p.getValidToDate());
+			for(WdProductImage i:p.getProductImages()){
+				String url = PRODUCT_IMAGE + i.getProductImageName();
+				vm.images.add(url);
+			}
+
+			res.put("product", vm);
+
+			WdRetailer r = p.getWdRetailer();
+			RetailerVM rvm = new RetailerVM();
+			rvm.setId(r.getId());
+			rvm.setBusinessName(r.getBusinessName());
+			rvm.setStreetName(r.getStreetName());
+			rvm.setStreetNo(r.getStreetNo());
+			rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
+			rvm.setSuburb(r.getSuburb());
+			rvm.setTradingName(r.getTradingName());
+			rvm.setCity(r.getCity());
+			rvm.setContactPerson(r.getContactPerson());
+			rvm.setWorkEmail(r.getWorkEmail());
+			rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
+
+			res.put("store", rvm);
+			
+			map.put("status", "200");
+			map.put("message", "OK.");
+			map.put("data", res);
+			return ok(Json.toJson(map));
+				
 		}
-		vm.createdDate = df.format(p.getCreatedDate());
-		vm.updatedDate = df.format(p.getUpdatedDate());
-		vm.validFromDate = df.format(p.getValidFromDate());
-		vm.validToDate = df.format(p.getValidToDate());
-		for(WdProductImage i:p.getProductImages()){
-			String url = PRODUCT_IMAGE + i.getProductImageName();
-			vm.images.add(url);
-		}
-
-		res.put("product", vm);
-
-		WdRetailer r = p.getWdRetailer();
-		RetailerVM rvm = new RetailerVM();
-		rvm.setId(r.getId());
-		rvm.setBusinessName(r.getBusinessName());
-		rvm.setStreetName(r.getStreetName());
-		rvm.setStreetNo(r.getStreetNo());
-		rvm.setLogoImage(RETAILER_IMAGE + r.getLogoImage());
-		rvm.setSuburb(r.getSuburb());
-		rvm.setTradingName(r.getTradingName());
-		rvm.setCity(r.getCity());
-		rvm.setContactPerson(r.getContactPerson());
-		rvm.setWorkEmail(r.getWorkEmail());
-		rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
-
-		res.put("store", rvm);
-
-		map.put("status", "200");
-		map.put("message", "OK.");
-		map.put("data", res);
-		return ok(Json.toJson(map));
+		return ok();
 	}
 
 	public static Result getRecentlyVisitedStores(){

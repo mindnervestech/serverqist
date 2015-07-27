@@ -139,6 +139,14 @@ public class CustomerSession extends Model{
 	   return find.where().eq("wdCustomer",wdCustomer).findList();
    }
    
+   public static List<CustomerSession>  getRetailerCustomerSession(WdRetailer retailer,WdCustomer customer){
+	   return find.where().eq("wdRetailer",retailer).eq("wdCustomer", customer).findList();
+   }
+   
+   public static  List<CustomerSession> getCustomerSessionByActiveRetailerId(WdRetailer wdRetailer)
+   {
+	   return find.where().eq("wdRetailer", wdRetailer).eq("end",null).findList();
+   }
    
    
   
