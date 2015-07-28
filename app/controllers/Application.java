@@ -859,6 +859,7 @@ public class Application extends Controller {
 		JsonNode data = request().body().asJson();
 		String lat = data.path("lat").asText();
 		String lon = data.path("lng").asText();
+		Long customerId = data.path("userId").asLong();
 		double lon1 = Double.parseDouble(lon);
 		double latn1 = Double.parseDouble(lat);
 		List<WdRetailer> wd = WdRetailer.findAll();
@@ -883,7 +884,7 @@ public class Application extends Controller {
 					vm.setContactPerson(w.getContactPerson());
 					vm.setWorkEmail(w.getWorkEmail());
 					vm.setQistNo(w.getQistSku()+String.format("%07d", w.getSkuPostfix()));
-					vm.setProducts(getProducts(w.getId()));
+					vm.setProducts(getProducts1(w.getId(),customerId));
 					vmList.add(vm);
 				}
 			}
@@ -916,9 +917,70 @@ public class Application extends Controller {
 		return ok(Json.toJson(map));
 	}
 
+	private static List<ProductVM> getProducts1(Long id,Long userId) {
+		WdRetailer wd = WdRetailer.findById(id);
+		WdCustomer wdc = WdCustomer.findById(userId);
+		List<WdProduct> prod = WdProduct.findByRetailer(wd);
+		
+		
+		
+		List<ProductVM> plist = new ArrayList<>();
+		for(WdProduct p : prod){
+			ProductVM vm = new ProductVM();
+			vm.id = p.getId();
+			vm.name = p.getName();
+			vm.description = p .getDescription();
+			vm.status = p .getStatus();
+			vm.isApproved = Boolean.parseBoolean(p.getIsApproved());
+			vm.mfrSku = p.getMfrSku();
+			vm.storeSku = p.getStoreSku();
+			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
+			vm.qistPrice = p.getQistPrice();
+			if(p.getApprovedDate() != null){
+				vm.approvedDate = df.format(p.getApprovedDate());
+			}
+			vm.createdDate = df.format(p.getCreatedDate());
+			vm.updatedDate = df.format(p.getUpdatedDate());
+			vm.validFromDate = df.format(p.getValidFromDate());
+			vm.validToDate = df.format(p.getValidToDate());
+			for(WdProductImage i:p.getProductImages()){
+				String url = PRODUCT_IMAGE + i.getProductImageName();
+				vm.images.add(url);
+			}
+			List<CustomerSession> cs = CustomerSession.getRetailerCustomerSession(wd,wdc);
+			if(cs.size()>0){
+				for(CustomerSession c : cs){
+				  SessionProduct p1 = SessionProduct.getProductStatus(c,p);
+				  if(p1!=null){
+				  System.out.println("in session"+p1.getStatus());
+				  vm.offerStatus = p1.getStatus();
+				  }else{
+					  if(p.getStatus().equals("active")){
+							vm.offerStatus = "Available";
+							}else{
+								vm.offerStatus = "Not Available";
+							}
+				  }
+				}
+			}else{
+				if(p.getStatus().equals("active")){
+				vm.offerStatus = "Available";
+				}else{
+					vm.offerStatus = "Not Available";
+				}
+				
+			}
+			plist.add(vm);
+		}
+		return plist;
+	}
+
 	private static List<ProductVM> getProducts(Long id) {
 		WdRetailer wd = WdRetailer.findById(id);
 		List<WdProduct> prod = WdProduct.findByRetailer(wd);
+		
+		
+		
 		List<ProductVM> plist = new ArrayList<>();
 		for(WdProduct p : prod){
 			ProductVM vm = new ProductVM();
@@ -946,7 +1008,7 @@ public class Application extends Controller {
 		}
 		return plist;
 	}
-
+	
 	public static Result getRetailerProducts() {
 		HashMap<String, Object> map = new HashMap<>();
 		JsonNode data = request().body().asJson();
@@ -1487,6 +1549,7 @@ public class Application extends Controller {
 			rvm.setQistNo(r.getQistSku()+String.format("%07d", r.getSkuPostfix()));
 
 			res.put("store", rvm);
+			res.put("showpopup",showpopup);
 			map.put("status", "200");
 			map.put("message", "OK.");
 			map.put("data", res);
