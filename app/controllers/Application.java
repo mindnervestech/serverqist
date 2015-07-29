@@ -66,7 +66,9 @@ import viewmodels.CustomerOrderVM;
 import viewmodels.CustomerSessionVM;
 import viewmodels.CustomerVM;
 import viewmodels.NewsVM;
+import viewmodels.ProductForNewsVM;
 import viewmodels.ProductVM;
+import viewmodels.RetailerInfoVM;
 import viewmodels.RetailerVM;
 import views.html.index;
 
@@ -710,7 +712,7 @@ public class Application extends Controller {
 		for(WdProduct p : product)
 		{
 			NewsVM vmn = new NewsVM();
-			ProductVM vm = new ProductVM();
+			ProductForNewsVM vm = new ProductForNewsVM();
 			vm.id = p.getId();
 			vm.name = p.getName();
 			vm.description = p .getDescription();
@@ -731,10 +733,15 @@ public class Application extends Controller {
 				String url = PRODUCT_IMAGE + i.getProductImageName();
 				vm.images.add(url);
 			}
-
+            vm.storeName = p.getWdRetailer().getBusinessName();
+            vm.city = p.getWdRetailer().getCity();
+            vm.streetName = p.getWdRetailer().getStreetName();
+            vm.streetNo = p.getWdRetailer().getStreetNo();
 			vmn.news="New prouct \'"+p.getName()+"\' added in store \'"+p.getWdRetailer().getBusinessName()+"\'";
 			vmn.productData=vm;
 			VMn.add(vmn);
+			
+			
 		}
 
 
