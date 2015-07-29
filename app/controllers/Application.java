@@ -867,6 +867,14 @@ public class Application extends Controller {
 		String lat = data.path("lat").asText();
 		String lon = data.path("lng").asText();
 		Long customerId = data.path("userId").asLong();
+		
+		if(customerId==0){
+			map.put("status", "500");
+			map.put("message", "Internal sever error");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
+		
 		double lon1 = Double.parseDouble(lon);
 		double latn1 = Double.parseDouble(lat);
 		List<WdRetailer> wd = WdRetailer.findAll();
