@@ -968,7 +968,11 @@ public class Application extends Controller {
 				  SessionProduct p1 = SessionProduct.getProductStatus(c,p);
 				  if(p1!=null){
 				  System.out.println("in session"+p1.getStatus());
+				  if(p1.getStatus().equals("None")||p1.getStatus().equals("Purchased")){
+					  vm.offerStatus="Wishlist";
+				  }else{
 				  vm.offerStatus = p1.getStatus();
+				  }
 				  }else{
 					  if(p.getStatus().equals("active")){
 							vm.offerStatus = "Available";
