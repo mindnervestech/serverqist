@@ -79,8 +79,8 @@ public class SessionProduct extends Model{
 		return find.where().eq("customerSession", customerSession).eq("purchased", true).findList();
 	
 	}
-	public static SessionProduct getProductStatus(CustomerSession cs,WdProduct p){
-		return find.where().eq("customerSession", cs).eq("wdProduct", p).findUnique();
+	public static List<SessionProduct> getProductStatus(CustomerSession cs,WdProduct p){
+		return find.where().eq("customerSession", cs).eq("wdProduct", p).findList();
 	}
 	
 	public static List<SessionProduct> getProductStatusonName(CustomerSession cs){
