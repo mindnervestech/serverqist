@@ -967,15 +967,18 @@ public class Application extends Controller {
 			if(cs.size()>0){
 				for(CustomerSession c : cs){
 				  System.out.println("enter");
-					SessionProduct p1 = SessionProduct.getProductStatus(c,p);
+					List<SessionProduct> p1 = SessionProduct.getProductStatus(c,p);
 				  System.out.println("exit");
-				  if(p1!=null){
-				  System.out.println("in session"+p1.getStatus());
-				  if(p1.getStatus().equals("None")){
+				  
+				  if(p1.size()>0){
+					  for(SessionProduct pp :p1){
+				  System.out.println("in session"+pp.getStatus());
+				  if(pp.getStatus().equals("None")){
 					  vm.offerStatus="Wishlist";
 				  }else{
-				  vm.offerStatus = p1.getStatus();
+				  vm.offerStatus = pp.getStatus();
 				  }
+					  }
 				  }else{
 					  if(p.getStatus().equals("active")){
 							vm.offerStatus = "Available";
@@ -983,6 +986,7 @@ public class Application extends Controller {
 								vm.offerStatus = "Not Available";
 							}
 				  }
+				  
 				}
 			}else{
 				if(p.getStatus().equals("active")){
