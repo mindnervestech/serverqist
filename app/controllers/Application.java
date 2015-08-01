@@ -935,6 +935,7 @@ public class Application extends Controller {
 	private static List<ProductVM> getProducts1(Long id,Long userId) {
 		WdRetailer wd = WdRetailer.findById(id);
 		WdCustomer wdc = WdCustomer.findById(userId);
+		System.out.println(wdc.getId());
 		List<WdProduct> prod = WdProduct.findByRetailer(wd);
 		
 		
@@ -965,7 +966,9 @@ public class Application extends Controller {
 			List<CustomerSession> cs = CustomerSession.getRetailerCustomerSession(wd,wdc);
 			if(cs.size()>0){
 				for(CustomerSession c : cs){
-				  SessionProduct p1 = SessionProduct.getProductStatus(c,p);
+				  System.out.println("enter");
+					SessionProduct p1 = SessionProduct.getProductStatus(c,p);
+				  System.out.println("exit");
 				  if(p1!=null){
 				  System.out.println("in session"+p1.getStatus());
 				  if(p1.getStatus().equals("None")){
