@@ -933,7 +933,10 @@ public class Application extends Controller {
 	}
 
 	private static List<ProductVM> getProducts1(Long id,Long userId) {
-		WdRetailer wd = WdRetailer.findById(id);
+		System.out.println("wwwwwwwwwwwww"+id);
+		System.out.println("qqqqqqqqqqqq"+userId);
+	    WdRetailer wd = WdRetailer.findById(id);
+	    System.out.println("ididid"+wd.getId());
 		WdCustomer wdc = WdCustomer.findById(userId);
 		System.out.println("eeeeeeeeeeee"+wdc.getId());
 		List<WdProduct> prod = WdProduct.findByRetailer(wd);
