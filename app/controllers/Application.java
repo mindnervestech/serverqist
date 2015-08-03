@@ -877,7 +877,9 @@ public class Application extends Controller {
 		
 		double lon1 = Double.parseDouble(lon);
 		double latn1 = Double.parseDouble(lat);
+		System.out.println("retailer enter");
 		List<WdRetailer> wd = WdRetailer.findAll();
+		System.out.println("find all retailer size"+wd.size());
 		List<RetailerVM> vmList = new ArrayList<>();
 		for(WdRetailer w:wd){
 			String fullAddress = w.getStreetNo()+","+w.getStreetName()+","+w.getSuburb()+","+w.getCity();
