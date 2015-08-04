@@ -112,6 +112,10 @@ public class WdRetailer extends Model {
 	@Lob
 	@Column(name="twitter_link")
 	private String twitterLink;
+	
+	@Lob
+	@Column(name="homepage_logo")
+	private String homepageLogo;
 
 	@Column(name="work_email")
 	private String workEmail;
@@ -125,9 +129,7 @@ public class WdRetailer extends Model {
 	@Column(name="work_url")
 	private String workUrl;
 	
-	@Column(name="homepage_logo")
-	private String homepageLogo;
-
+	
 	//bi-directional many-to-one association to WdProduct
 	@OneToMany(mappedBy="wdRetailer")
 	private List<WdProduct> wdProducts;
@@ -316,6 +318,16 @@ public class WdRetailer extends Model {
 		this.streetName = streetName;
 	}
 
+	
+	
+	public String getHomepageLogo() {
+		return homepageLogo;
+	}
+
+	public void setHomepageLogo(String homepageLogo) {
+		this.homepageLogo = homepageLogo;
+	}
+
 	public String getStreetNo() {
 		return this.streetNo;
 	}
@@ -396,15 +408,6 @@ public class WdRetailer extends Model {
 		this.wdProducts = wdProducts;
 	}
 	
-	
-
-	public String getHomepageLogo() {
-		return homepageLogo;
-	}
-
-	public void setHomepageLogo(String homepageLogo) {
-		this.homepageLogo = homepageLogo;
-	}
 
 	public WdProduct addWdProduct(WdProduct wdProduct) {
 		getWdProducts().add(wdProduct);
