@@ -957,6 +957,7 @@ public class Application extends Controller {
 			vm.storeSku = p.getStoreSku();
 			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 			vm.qistPrice = p.getQistPrice();
+			vm.originalPrice = p.getOriginalPrice();
 			if(p.getApprovedDate() != null){
 				vm.approvedDate = df.format(p.getApprovedDate());
 			}
@@ -1024,6 +1025,7 @@ public class Application extends Controller {
 			vm.storeSku = p.getStoreSku();
 			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 			vm.qistPrice = p.getQistPrice();
+			vm.originalPrice = p.getOriginalPrice();
 			if(p.getApprovedDate() != null){
 				vm.approvedDate = df.format(p.getApprovedDate());
 			}
@@ -1232,6 +1234,7 @@ public class Application extends Controller {
 						vm.storeSku = p.getWdProduct().getStoreSku();
 						vm.qistNo = p.getWdProduct().getQistSku() + String.format("%07d", p.getWdProduct().getSkuPostfix());
 						vm.qistPrice = p.getWdProduct().getQistPrice();
+						vm.originalPrice = p.getWdProduct().getOriginalPrice();
 						if(p.getWdProduct().getApprovedDate() != null){
 							vm.approvedDate = df.format(p.getWdProduct().getApprovedDate());
 						}
@@ -1327,6 +1330,7 @@ public class Application extends Controller {
 							vm.storeSku = p.getWdProduct().getStoreSku();
 							vm.qistNo = p.getWdProduct().getQistSku() + String.format("%07d", p.getWdProduct().getSkuPostfix());
 							vm.qistPrice = p.getWdProduct().getQistPrice();
+							vm.originalPrice = p.getWdProduct().getOriginalPrice();
 							if(p.getWdProduct().getApprovedDate() != null){
 								vm.approvedDate = df.format(p.getWdProduct().getApprovedDate());
 							}
@@ -1484,6 +1488,7 @@ public class Application extends Controller {
 		vm.storeSku = p.getStoreSku();
 		vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 		vm.qistPrice = p.getQistPrice();
+		vm.originalPrice = p.getOriginalPrice();
 		if(p.getApprovedDate() != null){
 			vm.approvedDate = df.format(p.getApprovedDate());
 		}
@@ -1551,6 +1556,7 @@ public class Application extends Controller {
 			vm.storeSku = p.getStoreSku();
 			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 			vm.qistPrice = p.getQistPrice();
+			vm.originalPrice = p.getOriginalPrice();
 			if(p.getApprovedDate() != null){
 				vm.approvedDate = df.format(p.getApprovedDate());
 			}
@@ -1669,6 +1675,7 @@ public class Application extends Controller {
 			vm.storeSku = p.getStoreSku();
 			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 			vm.qistPrice = p.getQistPrice();
+			vm.originalPrice = p.getOriginalPrice();
 			if(p.getApprovedDate() != null){
 				vm.approvedDate = df.format(p.getApprovedDate());
 			}
@@ -1750,6 +1757,7 @@ public class Application extends Controller {
 				vm.storeSku = p.getStoreSku();
 				vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 				vm.qistPrice = p.getQistPrice();
+				vm.originalPrice = p.getOriginalPrice();
 				if(p.getApprovedDate() != null){
 					vm.approvedDate = df.format(p.getApprovedDate());
 				}
@@ -1863,6 +1871,7 @@ public class Application extends Controller {
 			vm.storeSku = p.getStoreSku();
 			vm.qistNo = p.getQistSku() + String.format("%07d", p.getSkuPostfix());
 			vm.qistPrice = p.getQistPrice();
+			vm.originalPrice = p.getOriginalPrice();
 			if(p.getApprovedDate() != null){
 				vm.approvedDate = df.format(p.getApprovedDate());
 			}
@@ -1974,6 +1983,7 @@ public class Application extends Controller {
 					pvm.status = s.getWdProduct().getStatus();
 					pvm.storeSku = s.getWdProduct().getStoreSku();
 					pvm.qistPrice = s.getWdProduct().getQistPrice();
+					pvm.originalPrice = s.getWdProduct().getOriginalPrice();
 					if(s.getWdProduct().getApprovedDate() != null){
 						pvm.approvedDate = df.format(s.getWdProduct().getApprovedDate());
 					}
@@ -2062,6 +2072,7 @@ public class Application extends Controller {
 					pvm.status = p.getStatus();
 					pvm.storeSku = p.getStoreSku();
 					pvm.qistPrice = p.getQistPrice();
+					pvm.originalPrice = p.getOriginalPrice();
 					if(p.getApprovedDate() != null){
 						pvm.approvedDate = df.format(p.getApprovedDate());
 					}

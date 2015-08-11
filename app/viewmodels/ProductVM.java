@@ -14,6 +14,7 @@ public class ProductVM {
 	public String mfrSku;
 	public String name;
 	public Double qistPrice;
+	public Double originalPrice;
 	public String validFromDate;
 	public String validToDate;
 	public String status;

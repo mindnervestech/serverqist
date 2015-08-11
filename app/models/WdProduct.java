@@ -61,6 +61,9 @@ public class WdProduct extends Model {
 	
 	@Column(name="qist_price")
 	private Double qistPrice;
+	
+	@Column(name="original_price")
+	private Double originalPrice;
 
 	@Column(name="qr_code")
 	private String qrCode;
@@ -273,6 +276,14 @@ public class WdProduct extends Model {
 		return sessionProduct;
 	}
 	
+	public Double getOriginalPrice() {
+		return originalPrice;
+	}
+
+	public void setOriginalPrice(Double originalPrice) {
+		this.originalPrice = originalPrice;
+	}
+
 	public Double getQistPrice() {
 		return qistPrice;
 	}
