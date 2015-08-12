@@ -30,3 +30,4 @@ POST    /sendPushNotification                   controllers.Application.sendPush
 POST    /sendPushNotification1                  controllers.Application.sendPushNotification1()
 GET    	/getCustomerProfileImage/:id            controllers.Application.getCustomerProfileImage(id:Long)
 POST    /getOrder                               controllers.Application.getOrder()
+POST	/updateLocation							controllers.Application.updateLocation()

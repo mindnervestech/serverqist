@@ -15,8 +15,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
-import scala.collection.parallel.ParIterableLike.Find;
 
 
 /**

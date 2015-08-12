@@ -106,6 +106,10 @@ public class WdCustomer extends Model {
 	@OneToMany(mappedBy="wdCustomer")
 	private List<CustomerSession> customerSessions;
 	
+	private Double lat;
+	
+	private Double lng;
+	
 	public WdCustomer() {
 	}
 
@@ -116,10 +120,22 @@ public class WdCustomer extends Model {
 	public void setId(Long id) {
 		this.id = id;
 	}
-
 	
+	public Double getLat() {
+		return lat;
+	}
 
-	
+	public void setLat(Double lat) {
+		this.lat = lat;
+	}
+
+	public Double getLng() {
+		return lng;
+	}
+
+	public void setLng(Double lng) {
+		this.lng = lng;
+	}
 
 	public String getContactNo() {
 		return this.contactNo;

@@ -1,8 +1,5 @@
 package models;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +16,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
 
 
 /**

@@ -1,15 +1,10 @@
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import models.CustomerSession;
 import models.SessionProduct;
 import models.WdCustomer;
-
 import play.Application;
 import play.GlobalSettings;
 import play.libs.Akka;

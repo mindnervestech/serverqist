@@ -1,9 +1,5 @@
 package models;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -19,7 +15,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
 
 
 /**

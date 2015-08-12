@@ -125,6 +125,8 @@ public class Application extends Controller {
 		String GooglePlusId = users.get("GooglePlusId");
 		String TwitterId = users.get("TwitterId");
 		String imageUrl = users.get("imageUrl");
+		Double lat = Double.parseDouble(users.get("lat"));
+		Double lng = Double.parseDouble(users.get("lng"));
 		String imageDataString = null ;
 
 		WdCustomer c = new WdCustomer();
@@ -299,7 +301,8 @@ public class Application extends Controller {
 		c.setCreatedDate(d);
 		c.setUpdatedDate(d);
 		c.setQistSku("QCS");
-
+		c.setLat(lat);
+		c.setLng(lng);
 		c.save();
 
 		MultipartFormData body = request().body().asMultipartFormData();
@@ -405,6 +408,8 @@ public class Application extends Controller {
 
 		String email = data.path("email").asText();
 		String password = data.path("password").asText();
+		Double lat = data.path("lat").asDouble();
+		Double lng = data.path("lng").asDouble();
 		if(email.isEmpty() || email == null ||
 				password.isEmpty() || password == null){
 			map.put("status", "500");
@@ -448,6 +453,8 @@ public class Application extends Controller {
 		vm.qistNo = c.getQistSku()+String.format("%07d", c.getSkuPostfix());
 
 		c.setLastActive(new Date());
+		c.setLat(lat);
+		c.setLng(lng);
 		c.update();
 
 		HashMap<String, Object> map1 = new HashMap<>();
@@ -457,6 +464,28 @@ public class Application extends Controller {
 		map.put("status", "200");
 		map.put("message", "Login successfull.");
 		map.put("data", map1);
+		return ok(Json.toJson(map));
+	}
+	
+	public static Result updateLocation(){
+		HashMap<String, Object> map = new HashMap<>();
+		JsonNode data = request().body().asJson();
+		Long id = data.path("userId").asLong();
+		Double lat = data.path("lat").asDouble();
+		Double lng = data.path("lng").asDouble();
+		WdCustomer c = WdCustomer.findById(id);
+		if(c == null){
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
+		c.setLat(lat);
+		c.setLng(lng);
+		c.update();
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", null);
 		return ok(Json.toJson(map));
 	}
 
