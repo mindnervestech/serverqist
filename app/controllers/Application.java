@@ -125,8 +125,10 @@ public class Application extends Controller {
 		String GooglePlusId = users.get("GooglePlusId");
 		String TwitterId = users.get("TwitterId");
 		String imageUrl = users.get("imageUrl");
-		Double lat = Double.parseDouble(users.get("lat"));
-		Double lng = Double.parseDouble(users.get("lng"));
+		//Double lat = Double.parseDouble(users.get("lat"));
+		//Double lng = Double.parseDouble(users.get("lng"));
+		Double lat = 0D;
+		Double lng = 0D;
 		String imageDataString = null ;
 
 		WdCustomer c = new WdCustomer();
