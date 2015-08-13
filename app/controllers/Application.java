@@ -125,10 +125,10 @@ public class Application extends Controller {
 		String GooglePlusId = users.get("GooglePlusId");
 		String TwitterId = users.get("TwitterId");
 		String imageUrl = users.get("imageUrl");
-		//Double lat = Double.parseDouble(users.get("lat"));
-		//Double lng = Double.parseDouble(users.get("lng"));
-		Double lat = 0D;
-		Double lng = 0D;
+		Double lat = Double.parseDouble(users.get("lat"));
+		Double lng = Double.parseDouble(users.get("lng"));
+		//Double lat = 0D;
+		//Double lng = 0D;
 		String imageDataString = null ;
 
 		WdCustomer c = new WdCustomer();
@@ -144,7 +144,7 @@ public class Application extends Controller {
 					vm.name = (cc.getFirstname());
 					//vm.lastName = c.getLastname();
 					vm.email = cc.getEmail();
-					vm.password = cc.getPassword();
+					//vm.password = cc.getPassword();
 					/*vm.address = cc.getAddress();*/
 					vm.address1 = cc.getAddress1();
 					vm.address2 = cc.getAddress2();
@@ -183,7 +183,7 @@ public class Application extends Controller {
 					vm.name = (cc.getFirstname());
 					//vm.lastName = c.getLastname();
 					vm.email = cc.getEmail();
-					vm.password = cc.getPassword();
+					//vm.password = cc.getPassword();
 					/*vm.address = cc.getAddress();*/
 					vm.address1 = cc.getAddress1();
 					vm.address2 = cc.getAddress2();
@@ -222,7 +222,7 @@ public class Application extends Controller {
 					vm.name = (cc.getFirstname());
 					//vm.lastName = c.getLastname();
 					vm.email = cc.getEmail();
-					vm.password = cc.getPassword();
+					//vm.password = cc.getPassword();
 					/*vm.address = cc.getAddress();*/
 					vm.address1 = cc.getAddress1();
 					vm.address2 = cc.getAddress2();
@@ -378,7 +378,7 @@ public class Application extends Controller {
 		vm.name = (c.getFirstname());
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
-		vm.password = c.getPassword();
+		//vm.password = c.getPassword();
 		/*vm.address = c.getAddress();*/
 		vm.address1 = c.getAddress1();
 		vm.address2 = c.getAddress2();
@@ -438,7 +438,7 @@ public class Application extends Controller {
 		vm.name = (c.getFirstname());
 		//vm.lastName = c.getLastname();
 		vm.email = c.getEmail();
-		vm.password = c.getPassword();
+		//vm.password = c.getPassword();
 		/*vm.address = c.getAddress();*/
 		vm.address1 = c.getAddress1();
 		vm.address2 = c.getAddress2();
