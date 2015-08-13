@@ -110,6 +110,13 @@ public class WdCustomer extends Model {
 	
 	private Double lng;
 	
+	@Column(name="device_type")
+	private String deviceType;
+	
+	@Column(name="device_token")
+	private String deviceToken;
+	
+	
 	public WdCustomer() {
 	}
 
@@ -121,6 +128,22 @@ public class WdCustomer extends Model {
 		this.id = id;
 	}
 	
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
+
+	public String getDeviceToken() {
+		return deviceToken;
+	}
+
+	public void setDeviceToken(String deviceToken) {
+		this.deviceToken = deviceToken;
+	}
+
 	public Double getLat() {
 		return lat;
 	}

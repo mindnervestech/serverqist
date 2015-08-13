@@ -129,6 +129,8 @@ public class Application extends Controller {
 		Double lng = Double.parseDouble(users.get("lng"));
 		//Double lat = 0D;
 		//Double lng = 0D;
+		String deviceType = users.get("deviceType");
+		String deviceToken = users.get("deviceToken");
 		String imageDataString = null ;
 
 		WdCustomer c = new WdCustomer();
@@ -305,6 +307,8 @@ public class Application extends Controller {
 		c.setQistSku("QCS");
 		c.setLat(lat);
 		c.setLng(lng);
+		c.setDeviceType(deviceType);
+		c.setDeviceToken(deviceToken);
 		c.save();
 
 		MultipartFormData body = request().body().asMultipartFormData();
@@ -412,6 +416,8 @@ public class Application extends Controller {
 		String password = data.path("password").asText();
 		Double lat = data.path("lat").asDouble();
 		Double lng = data.path("lng").asDouble();
+		String deviceType = data.path("deviceType").asText();
+		String deviceToken = data.path("deviceToken").asText();
 		if(email.isEmpty() || email == null ||
 				password.isEmpty() || password == null){
 			map.put("status", "500");
@@ -457,6 +463,8 @@ public class Application extends Controller {
 		c.setLastActive(new Date());
 		c.setLat(lat);
 		c.setLng(lng);
+		c.setDeviceType(deviceType);
+		c.setDeviceToken(deviceToken);
 		c.update();
 
 		HashMap<String, Object> map1 = new HashMap<>();
@@ -1553,6 +1561,48 @@ public class Application extends Controller {
 		map.put("status", "200");
 		map.put("message", "OK.");
 		map.put("data", res);
+		return ok(Json.toJson(map));
+	}
+
+	public static Result addToWishlist(){
+		HashMap<String, Object> map = new HashMap<>();
+		JsonNode data = request().body().asJson();
+		Long userId = data.path("userId").asLong();
+		Long productId = data.path("productId").asLong();
+
+		WdCustomer w = WdCustomer.findById(userId);
+		if(w == null){
+			map.put("status", "500");
+			map.put("message", "User does not exist.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
+		
+		WdProduct p = WdProduct.findByProductId(productId);
+		if(p == null){
+			map.put("status", "500");
+			map.put("message", "Product not found.");
+			map.put("data", null);
+			return ok(Json.toJson(map));
+		}
+
+		Date today = new Date();
+
+		CustomerSession cs1 = new CustomerSession();
+		cs1.setWdRetailer(p.getWdRetailer());
+		cs1.setWdCustomer(w);
+		cs1.setStart(today);
+		cs1.setEnd(today);
+		cs1.save();
+		SessionProduct sp  = new  SessionProduct() ;
+		sp.setWdProduct(p);
+		sp.setCustomerSession(cs1);
+		sp.setStatus("Wishlist");
+		sp.save();
+
+		map.put("status", "200");
+		map.put("message", "OK.");
+		map.put("data", null);
 		return ok(Json.toJson(map));
 	}
 
