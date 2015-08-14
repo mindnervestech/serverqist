@@ -74,6 +74,9 @@ public class WdCustomerOrders extends Model{
 	@Column(name="billing_zip")
 	private String billingZip;
 	
+	@Column(name="contact_no")
+	private String contactNo;
+	
 	@Column(name="created_date")
 	private Date createdDate;
 	
@@ -101,6 +104,14 @@ public class WdCustomerOrders extends Model{
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	public String getContactNo() {
+		return contactNo;
+	}
+
+	public void setContactNo(String contactNo) {
+		this.contactNo = contactNo;
 	}
 
 	public String getShippingAddress1() {

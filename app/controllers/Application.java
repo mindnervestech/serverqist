@@ -1174,6 +1174,7 @@ public class Application extends Controller {
 		String state = data.path("state").asText();
 		String country = data.path("country").asText();
 		String zip = data.path("zip").asText();
+		String contactNo = data.path("contactNo").asText();
 		WdCustomer c = WdCustomer.findById(userId);
 		Date date = new Date();
 		if(c==null)
@@ -1212,6 +1213,7 @@ public class Application extends Controller {
 				o.setCreatedDate(date);
 				o.setUpdatedDate(date);
 				o.setSession(cs1);
+				o.setContactNo(contactNo);
 				o.save();
 				//create and save customer order with all details
 				for(SessionProduct p : cs1.getSessionProducts()){
